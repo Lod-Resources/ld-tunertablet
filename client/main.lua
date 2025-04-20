@@ -6,7 +6,7 @@ function _L(key, ...)
     local lang = Config.Language or "en"
     local result = Locales.Languages[lang][key] or Locales.Languages["en"][key] or key
     
-    -- Handle string replacement for parameters
+
     local args = {...}
     if #args > 0 then
         for i, v in ipairs(args) do
@@ -17,7 +17,7 @@ function _L(key, ...)
     return result
 end
 
--- Update the notifications to use the localization system
+
 RegisterCommand("tunertablet", function()
     local ped = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(ped, false)
@@ -27,13 +27,12 @@ RegisterCommand("tunertablet", function()
         return
     end
     
-    -- Check if player is in driver's seat
+
     if GetPedInVehicleSeat(vehicle, -1) ~= ped then
         lib.notify({title = _L("tuning_tablet"), description = _L("need_driver_seat"), type = 'error'})
         return
     end
-    
-    -- Call the OpenUI function
+
     OpenUI()
 end, false)
 
@@ -57,7 +56,7 @@ function OpenUI()
 
     if IsPedInAnyVehicle(ped) then 
         local getData = GetVehData(vehicle)
-        TriggerServerEvent("m-tuning:createData", GetVehicleNumberPlateText(vehicle), getData)
+        TriggerServerEvent("ld-tunertablet:createData", GetVehicleNumberPlateText(vehicle), getData)
         SetNuiFocus(true, true)
         SendNUIMessage({
             action = "SHOW_INTERFACE",
@@ -97,7 +96,7 @@ RegisterNUICallback("SAVE_SIMPLE_SETTINGS", function(data)
     local ped = PlayerPedId()
     local veh = GetVehiclePedIsUsing(ped)
     setVehData(veh, data)
-    TriggerServerEvent("m-tuning:CreateTableData", GetVehicleNumberPlateText(veh), data, "TuningData")
+    TriggerServerEvent("ld-tunertablet:CreateTableData", GetVehicleNumberPlateText(veh), data, "TuningData")
     lib.notify({title = _L("settings_saved"), description = _L("simple_settings_applied"), type = 'success'})
 end)
 
@@ -105,9 +104,9 @@ RegisterNUICallback("SAVE_ADVANCED_SETTINGS", function(data)
     local ped = PlayerPedId()
     local veh = GetVehiclePedIsUsing(ped)
     local plate = GetVehicleNumberPlateText(veh)
-    TriggerServerEvent("m-tuning:createData:NewSave", data, plate, data.dataname)
+    TriggerServerEvent("ld-tunertablet:createData:NewSave", data, plate, data.dataname)
     setAdvancedData(veh, data, false, nil)
-    TriggerServerEvent("m-tuning:ActiveModeData", plate, data, true)
+    TriggerServerEvent("ld-tunertablet:ActiveModeData", plate, data, true)
     lib.notify({title = _L("advanced_settings"), description = _L("settings_applied"), type = 'success'})
 end)
 
@@ -116,7 +115,7 @@ RegisterNUICallback("DEFAULT_BACK", function ()
     local veh = GetVehiclePedIsUsing(ped)
     local plate = GetVehicleNumberPlateText(veh)
     DefaultAdvancedData(veh, plate)
-    TriggerServerEvent("m-tuning:ActiveModeData", plate)
+    TriggerServerEvent("ld-tunertablet:ActiveModeData", plate)
     lib.notify({title = _L("default_settings"), description = _L("restored_factory"), type = 'info'})
 end)
 

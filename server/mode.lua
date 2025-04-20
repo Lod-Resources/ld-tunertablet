@@ -1,4 +1,4 @@
-RegisterServerEvent('m-tuning:CreateTableData', function(plate, data, dataName)
+RegisterServerEvent('ld-tunertablet:CreateTableData', function(plate, data, dataName)
     if dataName == "IsSportModOn" then
         IsSportModOn[plate] = true
         oldSportModData[plate] = data
@@ -16,14 +16,14 @@ RegisterServerEvent('m-tuning:CreateTableData', function(plate, data, dataName)
     end
 end)
 
-RegisterServerEvent('m-tuning:OpenNormalMod')
-AddEventHandler('m-tuning:OpenNormalMod', function(plate)
+RegisterServerEvent('ld-tunertablet:OpenNormalMod')
+AddEventHandler('ld-tunertablet:OpenNormalMod', function(plate)
     IsSportModOn[plate] = false
     DriftMode[plate] = false
 end)
 
 Citizen.CreateThread(function()
-    lib.callback.register('m-tuning:GetData', function(source, cb, plate, dataName)
+    lib.callback.register('ld-tunertablet:GetData', function(source, cb, plate, dataName)
         if dataName == "TuningData" then
             cb(TuningData[plate])
         elseif dataName == "CurrentVehicleData" then

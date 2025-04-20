@@ -9,7 +9,7 @@ RegisterNUICallback("GET_CUSTOMS_DATA", function(data)
     end
     local plate = GetVehicleNumberPlateText(vehicle)
     local dataName = "currentData"
-    lib.callback('m-tuning:sqlDta', false, function(Datalar)
+    lib.callback('ld-tunertablet:sqlDta', false, function(Datalar)
         SendNUIMessage({
             action = "GET_CURRENT_DATA",
             GetCurrentData = Datalar or {},
@@ -22,7 +22,7 @@ RegisterNUICallback("DELETE_PRESET", function(data)
     local vehicle = GetVehiclePedIsUsing(ped)
     local plate = GetVehicleNumberPlateText(vehicle)
 
-    TriggerServerEvent("m-tuning:deleteCurrentData", data, plate)
+    TriggerServerEvent("ld-tunertablet:deleteCurrentData", data, plate)
     lib.notify({title = _L("success"), description = _L("preset_deleted"), type = 'success'})
 end)
 
@@ -41,7 +41,7 @@ RegisterNUICallback("GET_XML_DATA", function(data)
     end
     setAdvancedData(vehicle, data, true, nil)
 
-    TriggerServerEvent("m-tuning:ActiveModeData", plate, data.vehicleData.AdvancedConfigurationData, false)
+    TriggerServerEvent("ld-tunertablet:ActiveModeData", plate, data.vehicleData.AdvancedConfigurationData, false)
     lib.notify({title = _L("success"), description = _L("xml_data"), type = 'success'})
 end)
 

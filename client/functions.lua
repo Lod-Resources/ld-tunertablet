@@ -64,7 +64,7 @@ function setAdvancedData(veh, data, bool, three)
     end
 
 
-    TriggerServerEvent("m-tuning:CreateTableData", GetVehicleNumberPlateText(veh), vehicleData, "CurrentVehicleData")
+    TriggerServerEvent("ld-tunertablet:CreateTableData", GetVehicleNumberPlateText(veh), vehicleData, "CurrentVehicleData")
 
 
     SetVehicleHandlingFloat(veh, "CHandlingData", "fDownforceModifier", tonumber(vehicleData.fDownforceModifier) + 0.0)
@@ -146,10 +146,10 @@ function DefaultAdvancedData(veh,plate, GelenData)
             SetVehicleHandlingFloat(veh, "CHandlingData", "fAntiRollBarBiasFront", tonumber(data.fAntiRollBarBiasFront)  + 0.0 )
             SetVehicleHandlingFloat(veh, "CHandlingData", "fRollCentreHeightFront", tonumber(data.fRollCentreHeightFront)  + 0.0 )
             SetVehicleHandlingFloat(veh, "CHandlingData", "fRollCentreHeightRear", tonumber(data.fRollCentreHeightRear)  + 0.0 )
-            TriggerServerEvent("m-tuning:CreateTableData", plate, data, "CurrentVehicleData")
+            TriggerServerEvent("ld-tunertablet:CreateTableData", plate, data, "CurrentVehicleData")
         end
     else
-        lib.callback('m-tuning:sqlDta', false, function(data)
+        lib.callback('ld-tunertablet:sqlDta', false, function(data)
 
             if data ~= nil then 
                 local tonum = tonumber(data.nInitialDriveGears)
@@ -192,7 +192,7 @@ function DefaultAdvancedData(veh,plate, GelenData)
                 SetVehicleHandlingFloat(veh, "CHandlingData", "fAntiRollBarBiasFront", tonumber(data.fAntiRollBarBiasFront)  + 0.0 )
                 SetVehicleHandlingFloat(veh, "CHandlingData", "fRollCentreHeightFront", tonumber(data.fRollCentreHeightFront)  + 0.0 )
                 SetVehicleHandlingFloat(veh, "CHandlingData", "fRollCentreHeightRear", tonumber(data.fRollCentreHeightRear)  + 0.0 )
-                TriggerServerEvent("m-tuning:CreateTableData", plate, data, "CurrentVehicleData")
+                TriggerServerEvent("ld-tunertablet:CreateTableData", plate, data, "CurrentVehicleData")
             end
         end, plate, "DefaultData")
     end

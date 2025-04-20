@@ -8,19 +8,19 @@ RegisterNuiCallback("CHANGE_MODE", function(data)
         local plate = GetVehicleNumberPlateText(vehicle)
 
         if mode == "Drift Mode" then
-            TriggerServerEvent("m-tuning:CreateTableData", plate, false, "NormalMod")
+            TriggerServerEvent("ld-tunertablet:CreateTableData", plate, false, "NormalMod")
             SportModOn[plate] = false
             if not driftMod[plate] then
                 driftMod[plate] = true
-                TriggerServerEvent("m-tuning:CreateTableData", plate, true, "DriftMode")
+                TriggerServerEvent("ld-tunertablet:CreateTableData", plate, true, "DriftMode")
                 lib.notify({title = _L("drift_mode"), description = _L("mode_enabled"), type = 'success'})
             else
                 driftMod[plate] = false
-                TriggerServerEvent("m-tuning:CreateTableData", plate, false, "DriftMode")
+                TriggerServerEvent("ld-tunertablet:CreateTableData", plate, false, "DriftMode")
                 lib.notify({title = _L("drift_mode"), description = _L("mode_disabled"), type = 'error'})
             end
         elseif mode == "Sport Mode" then 
-            TriggerServerEvent("m-tuning:CreateTableData", plate, false, "NormalMod")
+            TriggerServerEvent("ld-tunertablet:CreateTableData", plate, false, "NormalMod")
             driftMod[plate] = false
             if not SportModOn[plate] then
                 SportModOn[plate] = true
@@ -28,7 +28,7 @@ RegisterNuiCallback("CHANGE_MODE", function(data)
                 lib.notify({title = _L("sport_mode"), description = _L("mode_enabled"), type = 'success'})
             else
                 SportModOn[plate] = false
-                lib.callback('m-tuning:GetData',false, function(dataone)
+                lib.callback('ld-tunertablet:GetData',false, function(dataone)
                     if dataone == nil or dataone == false then
                         SportModOnFunction(vehicle, plate)
                     else
@@ -40,7 +40,7 @@ RegisterNuiCallback("CHANGE_MODE", function(data)
         elseif mode == "Eco Mode" then
             driftMod[plate] = false
             SportModOn[plate] = false
-            TriggerServerEvent("m-tuning:CreateTableData", plate, false, "NormalMod")
+            TriggerServerEvent("ld-tunertablet:CreateTableData", plate, false, "NormalMod")
             NormalMode(vehicle, plate, oldSportMod[plate])
             lib.notify({title = _L("eco_mode"), description = _L("mode_enabled"), type = 'success'})
             
@@ -65,7 +65,7 @@ function SportModOnFunction(vehicle, plate)
 	SetVehicleHandlingField(vehicle, 'CHandlingData', 'fDriveInertia', Config.Modes["SportModeSettings"]["fDriveInertia"])
 	SetVehicleHandlingField(vehicle, 'CHandlingData', 'fClutchChangeRateScaleUpShift', oldfClutchChangeRateScaleUpShiftData * Config.Modes["SportModeSettings"]["fClutchChangeRateScaleUpShift"]) 
 	SetVehicleHandlingField(vehicle, 'CHandlingData', 'fClutchChangeRateScaleDownShift', oldfClutchChangeRateScaleDownShiftData * Config.Modes["SportModeSettings"]["fClutchChangeRateScaleDownShift"])
-    TriggerServerEvent("m-tuning:CreateTableData", plate, oldSportMod[plate], "IsSportModOn")
+    TriggerServerEvent("ld-tunertablet:CreateTableData", plate, oldSportMod[plate], "IsSportModOn")
     lib.notify({title = _L("sport_mode"), description = _L("settings_applied"), type = 'success'})
 end
 
@@ -79,7 +79,7 @@ function NormalMode(vehicle, plate, olddata)
         SetVehicleHandlingField(vehicle, 'CHandlingData', 'fClutchChangeRateScaleUpShift', olddata.oldfClutchChangeRateScaleUpShift)
         SetVehicleHandlingField(vehicle, 'CHandlingData', 'fClutchChangeRateScaleDownShift', olddata.oldfClutchChangeRateScaleDownShift)
     end
-    TriggerServerEvent("m-tuning:CreateTableData", plate , false, "CloseSportMod")
+    TriggerServerEvent("ld-tunertablet:CreateTableData", plate , false, "CloseSportMod")
     lib.notify({title = _L("normal_mode"), description = _L("settings_applied"), type = 'success'})
 end
 
@@ -99,7 +99,7 @@ Citizen.CreateThread(function()
                 lastVehicle = vehicle
                 Wait(200)
                 local activebool = false
-                lib.callback('m-tuning:GetData',false, function(activedata)
+                lib.callback('ld-tunertablet:GetData',false, function(activedata)
                     Wait(1000)
                     if activedata ~= nil then
                         local ped = PlayerPedId()
@@ -110,7 +110,7 @@ Citizen.CreateThread(function()
                 end, plate, "ActiveData") 
                 Wait(200)
 
-                lib.callback('m-tuning:GetData',false, function(driftModData)
+                lib.callback('ld-tunertablet:GetData',false, function(driftModData)
                     Wait(1000)
                     if driftModData == true then
                         if driftMod[plate] == false or driftMod[plate] == nil then
@@ -124,7 +124,7 @@ Citizen.CreateThread(function()
                 end, plate, "DriftMode") 
 
                 Wait(200)
-                lib.callback('m-tuning:GetData',false, function(SportModOnData)
+                lib.callback('ld-tunertablet:GetData',false, function(SportModOnData)
                     Wait(1000)
                     if SportModOnData == true then
                         if SportModOn[plate] == false or SportModOn[plate] == nil then
@@ -132,7 +132,7 @@ Citizen.CreateThread(function()
                         end
                     elseif SportModOnData == false then
                         if SportModOn[plate] == true then
-                            lib.callback('m-tuning:GetData',false, function(SportModeBool, olddata)
+                            lib.callback('ld-tunertablet:GetData',false, function(SportModeBool, olddata)
                                 if SportModeBool == nil or SportModeBool == true then
                                     if oldSportMod[plate] == nil or oldSportMod[plate] == false then
                                         olddata = olddata
@@ -143,7 +143,7 @@ Citizen.CreateThread(function()
                                     SetVehicleHandlingField(vehicle, 'CHandlingData', 'fDriveInertia', olddata.oldffDriveInertia)
                                     SetVehicleHandlingField(vehicle, 'CHandlingData', 'fClutchChangeRateScaleUpShift', olddata.oldfClutchChangeRateScaleUpShift)
                                     SetVehicleHandlingField(vehicle, 'CHandlingData', 'fClutchChangeRateScaleDownShift', olddata.oldfClutchChangeRateScaleDownShift)
-                                    TriggerServerEvent("m-tuning:CreateTableData", plate , false, "CloseSportMod")
+                                    TriggerServerEvent("ld-tunertablet:CreateTableData", plate , false, "CloseSportMod")
                                 end
      
                             end, plate, "exOldData")
@@ -153,14 +153,14 @@ Citizen.CreateThread(function()
                 end, plate, "IsSportModOn") 
 
                 Wait(200)
-                lib.callback('m-tuning:GetData',false, function(tuningdata)
+                lib.callback('ld-tunertablet:GetData',false, function(tuningdata)
                     Wait(1000)
                     if tuningdata ~= nil then
                         setVehData(vehicle, tuningdata)
                     end
                 end, plate, "TuningData") 
                 Wait(200)
-                lib.callback('m-tuning:GetData',false, function(currentdata)
+                lib.callback('ld-tunertablet:GetData',false, function(currentdata)
                     Wait(1000)
                     if currentdata ~= nil then
                         if not activebool then
@@ -235,7 +235,7 @@ Citizen.CreateThread(function ()
                 SetVehicleHandlingField(vehicle, 'CHandlingData', 'fClutchChangeRateScaleDownShift', oldfClutchChangeRateScaleDownShiftData * 8)
                 break
             else
-                lib.callback('m-tuning:GetData',false, function(dataone, olddata)
+                lib.callback('ld-tunertablet:GetData',false, function(dataone, olddata)
                     if dataone == nil or dataone == false then 
                         return
                     else
@@ -245,7 +245,7 @@ Citizen.CreateThread(function ()
                         SetVehicleHandlingField(vehicle, 'CHandlingData', 'fDriveInertia', olddata.oldffDriveInertia)
                         SetVehicleHandlingField(vehicle, 'CHandlingData', 'fClutchChangeRateScaleUpShift', olddata.oldfClutchChangeRateScaleUpShift)
                         SetVehicleHandlingField(vehicle, 'CHandlingData', 'fClutchChangeRateScaleDownShift', olddata.oldfClutchChangeRateScaleDownShift)
-                        TriggerServerEvent("m-tuning:CreateTableData", plate , false, "CloseSportMod")
+                        TriggerServerEvent("ld-tunertablet:CreateTableData", plate , false, "CloseSportMod")
                     end
 
                 end, plate, "exOldData")

@@ -1,9 +1,16 @@
 
 IsSportModOn, oldSportModData, DriftMode, TuningData, CurrentVehicleData, ActiveMode, Core = {}, {}, {}, {}, {}, {}, nil
 
+AddEventHandler('onResourceStart', function(resourceName)
+    if (GetCurrentResourceName() ~= resourceName) then
+        return
+    end
+    Wait(2000)
+    print(("[^9LD-TUNERTABLET^7] ^3For support if you have any problems^7: https://discord.gg/P92aXCShVP "))
+end)
 
 
-RegisterNetEvent("m-tuning:createData:NewSave", function(newData, plate)
+RegisterNetEvent("ld-tunertablet:createData:NewSave", function(newData, plate)
     local data = ExecuteSQL('SELECT * FROM `ld_tuning` WHERE plate = @plate', {["@plate"] = plate})
     if next(data) == nil or next(data) == "[]" then
         return
@@ -50,7 +57,7 @@ end)
 
 
 
-RegisterNetEvent("m-tuning:createData", function(plate, vehdata)
+RegisterNetEvent("ld-tunertablet:createData", function(plate, vehdata)
     GetData = ExecuteSQL('SELECT * FROM `ld_tuning` WHERE plate = @plate', {["@plate"] = plate})
     ActiveMode[plate] = vehdata
     if next(GetData) == nil or  next(GetData) == "[]" then

@@ -4,7 +4,7 @@ function _L(key, ...)
     local lang = Config.Language or "en"
     local result = Locales.Languages[lang][key] or Locales.Languages["en"][key] or key
     
-    -- Handle string replacement for parameters
+
     local args = {...}
     if #args > 0 then
         for i, v in ipairs(args) do

@@ -1,6 +1,6 @@
 Config = {}
 
-Config.Language = "en" 
+Config.Language = "en" -- just en if u want add more lang from locales.lua
 
 Config.Menu = {
     ["Commands"] = {

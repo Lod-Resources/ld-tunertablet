@@ -1,17 +1,17 @@
 Citizen.CreateThread(function()
     
-    lib.callback.register('m-tuning:sqlDta', function(source, plate, dataName)
+    lib.callback.register('ld-tunertablet:sqlDta', function(source, plate, dataName)
         if not dataName then
-            -- print("⚠️ ERROR: dataName is nil!")
+            -- print("dataName is nil!")
             return nil
         end
     
         local data = ExecuteSQL('SELECT * FROM `ld_tuning` WHERE plate = @plate', {["@plate"] = plate})
     
         if data and #data > 0 then
-            -- print("✅ SQL Data Exists:", json.encode(data[1]))
+            -- print("SQL Data Exists:", json.encode(data[1]))
         else
-            -- print("❌ No Data Found for plate:", plate)
+            -- print("No Data Found for plate:", plate)
             return nil
         end
     
@@ -21,13 +21,13 @@ Citizen.CreateThread(function()
             return data[1].currentData and json.decode(data[1].currentData) or nil
         else
             TriggerClientEvent('ox_lib:notify', source, {title = _L('warning'),description = _L('invalid_preset'),type = 'warning'})
-            -- print("⚠️ ERROR: Invalid dataName received:", dataName)
+            -- print(" Invalid dataName received:", dataName)
             return nil
         end
     end)
 end)
 
-RegisterNetEvent("m-tuning:deleteCurrentData", function(jsdata, plate)
+RegisterNetEvent("ld-tunertablet:deleteCurrentData", function(jsdata, plate)
     local data = ExecuteSQL('SELECT * FROM `ld_tuning` WHERE plate = @plate', {["@plate"] = plate})
     
     if not data or #data == 0 then
@@ -39,7 +39,7 @@ RegisterNetEvent("m-tuning:deleteCurrentData", function(jsdata, plate)
     local jsonData = json.decode(currentData)
     
     if not jsonData or #jsonData == 0 then
-        -- print("❌ No presets found in currentData")
+        -- print("No presets found in currentData")
         return
     end
 
@@ -63,17 +63,17 @@ RegisterNetEvent("m-tuning:deleteCurrentData", function(jsdata, plate)
             if rowsChanged > 0 then
                 TriggerClientEvent('ox_lib:notify', source, {title = _L('success'),description = _L('preset_deleted'),type = 'sucess'})
             else
-                print("❌ Error updating ld_tuning.")
+                print("Error updating ld_tuning.")
             end
         end)
     else
-        -- print("❌ No matching preset found for: " .. jsdata.vehicleData.title)
+        -- print("No matching preset found for: " .. jsdata.vehicleData.title)
         TriggerClientEvent('ox_lib:notify', source, {title = _L('warning'),description = _L('invalid_preset'),type = 'warning'})
     end
 end)
 
 
-RegisterNetEvent("m-tuning:ActiveModeData", function(plate, activedata, bool)
+RegisterNetEvent("ld-tunertablet:ActiveModeData", function(plate, activedata, bool)
     if activedata ~= nil then
         local activeDataToSave
 
