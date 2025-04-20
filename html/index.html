@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LD Tunerchip</title>
+    <script src="./src/scripts/vue.global.js"></script>
+    <script src="./src/scripts/vuex.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./src/style/style.css">
+   
+  </head>
+  <body class="overflow-hidden">
+    <div id="app" class="flex justify-center items-center w-full  h-[100vh] relative " style="background-size: 100% 100%;">
+      <div class="flex justify-center items-center w-[63.75vw] h-[74.537vh] shrink-0  rounded-[1.9792vw] border-2 border-solid border-white overflow-hidden [background:#0C0C0C]" v-if="showUI"> <!--[background:#0C0C0C]-->
+        <div class="flex w-[63.2292vw] h-[73.6111vh] shrink-0  rounded-[1.9792vw] [background:#06080C]"> <!--[background:#06080C]-->
+          <div class="w-[14.0104vw] h-full shrink-0 [background:rgba(255,255,255,0.04)] rounded-[3.5185vh_0vh_0vh_3.5185vh] border-r-[rgba(255,255,255,0.05)] border-r border-solid pl-[2.2917vw]">
+            <div class="flex flex-col justify-end w-full h-[10%] ">
+              <p class="text-white [font-family:Gilroy-SemiBold] text-[.8333vw] font-normal leading-[normal]">{{ Locales["welcome"] }}, Toby McNuty</p>
+              <p class="text-white [font-family:Gilroy-SemiBold] text-[1.4583vw] font-normal leading-[normal]">TunerChip</p>
+            </div>
+            <div class="w-full h-[2.2222vh] "></div>
+            <div class="flex flex-col w-full h-[40%] gap-y-[0.9259vh]">
+              <div
+              v-for="(page, index) in Pages"
+              :key="index"
+              @click="updatePage(page)"
+              @mouseover="showSubPages = page.title === 'Advanced Configuration'"
+              @mouseleave="hideSubPages"
+              class="flex justify-between items-center w-[11.7188vw] h-[4.0741vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_0px_0px_5px] px-[.5208vw] cursor-pointer 
+                hover:[background:rgba(255,255,255,0.05)] group">
+                <div></div>
+                <p class="text-white [font-family:Gilroy-Medium] text-[.7292vw] font-normal leading-[normal]">{{page.title}}</p>
+                <svg xmlns="http://www.w3.org/2000/svg" width=".625vw" height="0.9259vh" viewBox="0 0 12 10" fill="none" 
+                  class="svg-menu">
+                  <path d="M7 1L11 5L7 9M1 1L5 5L1 9" stroke="white" stroke-opacity="0.05" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div v-show="showSubPages"  @mouseover="showSubPages = true"  @mouseleave="hideSubPages" class="absolute  left-[32.4vw] top-[37.7vh] overflow-hidden">
+             <div class="ml-[0.2vw] w-fit h-fit [background:#101216] rounded-[5px_5px_5px_5px]">
+              <div
+              v-for="(subpage, index) in subPages"
+              :key="index"
+              @click="updateSubPage(subpage)"
+              class="flex justify-between items-center w-[11.7188vw] h-[4.0741vh] shrink-0 [background:rgba(255,255,255,0.02)] px-[.5208vw] cursor-pointer 
+                hover:[background:rgba(255,255,255,0.05)] group">
+                <div></div>
+                <p class="text-white [font-family:Gilroy-Medium] text-[.7292vw] font-normal leading-[normal]">{{subpage.title}}</p>
+                <svg xmlns="http://www.w3.org/2000/svg" width=".625vw" height="0.9259vh" viewBox="0 0 12 10" fill="none" 
+                  class="svg-menu">
+                  <path d="M7 1L11 5L7 9M1 1L5 5L1 9" stroke="white" stroke-opacity="0.05" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                </div>
+                </div>
+            </div>
+            <div class="w-full h-[3.7889vh] "></div>
+            <div class="flex flex-col justify-start w-full h-[30%] gap-y-[0.9259vh] overflow-x-auto">
+              <p class="text-white [font-family:Gilroy-SemiBold] text-[.8333vw] font-normal leading-[normal]"> {{ Locales["ucreatedpresets"] }}</p>
+              <div class="flex justify-between items-center w-[11.7188vw] h-[4.0741vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_0px_0px_5px] px-[.5208vw] cursor-pointer 
+              hover:[background:rgba(255,255,255,0.05)] group" v-for="(preset, index) in Presets" 
+              :key="index" @click="InsertXML(preset.title)">
+                <div class="flex flex-col justify-center w-fit h-full">
+                  <p class="text-white [font-family:Gilroy-Medium] text-[.7292vw] font-normal leading-[normal]">{{ preset.title }}</p>
+                  <p class="text-white [font-family:Gilroy-Medium] text-[.5208vw] font-normal leading-[normal]">{{ preset.description }}</p>
+                </div>
+                <div class="flex gap-x-[.3604vw] w-fit h-fit">
+                  <svg xmlns="http://www.w3.org/2000/svg" width=".625vw" height="1.2037vh" viewBox="0 0 12 13" fill="none">
+                    <mask id="path-1-inside-1_43_136" fill="white">
+                      <path d="M10.4446 4.88889L9.33622 11.1922C9.291 11.4496 9.15649 11.6829 8.95632 11.8509C8.75615 12.019 8.50314 12.1111 8.24178 12.1111H3.75844C3.49708 12.1111 3.24407 12.019 3.0439 11.8509C2.84373 11.6829 2.70921 11.4496 2.664 11.1922L1.55566 4.88889"/>
+                    </mask>
+                    <path d="M10.4446 4.88889L9.33622 11.1922C9.291 11.4496 9.15649 11.6829 8.95632 11.8509C8.75615 12.019 8.50314 12.1111 8.24178 12.1111H3.75844C3.49708 12.1111 3.24407 12.019 3.0439 11.8509C2.84373 11.6829 2.70921 11.4496 2.664 11.1922L1.55566 4.88889" fill="white" fill-opacity="0.05"/>
+                    <path d="M9.33622 11.1922L8.35133 11.019L8.3513 11.0192L9.33622 11.1922ZM8.24178 12.1111L8.24185 11.1111H8.24178V12.1111ZM3.75844 12.1111V11.1111H3.75836L3.75844 12.1111ZM2.664 11.1922L3.64892 11.0192L3.64889 11.019L2.664 11.1922ZM9.45966 4.71571L8.35133 11.019L10.3211 11.3654L11.4294 5.06206L9.45966 4.71571ZM8.3513 11.0192C8.34678 11.045 8.33332 11.0683 8.31331 11.0851L9.59933 12.6168C9.97965 12.2975 10.2352 11.8543 10.3211 11.3652L8.3513 11.0192ZM8.31331 11.0851C8.29329 11.1019 8.26799 11.1111 8.24185 11.1111L8.2417 13.1111C8.73829 13.1111 9.21901 12.9361 9.59933 12.6168L8.31331 11.0851ZM8.24178 11.1111H3.75844V13.1111H8.24178V11.1111ZM3.75836 11.1111C3.73223 11.1111 3.70693 11.1019 3.68691 11.0851L2.40089 12.6168C2.78121 12.9361 3.26192 13.1111 3.75852 13.1111L3.75836 11.1111ZM3.68691 11.0851C3.66689 11.0683 3.65344 11.045 3.64892 11.0192L1.67908 11.3652C1.76499 11.8543 2.02057 12.2975 2.40089 12.6168L3.68691 11.0851ZM3.64889 11.019L2.54055 4.71571L0.570773 5.06206L1.67911 11.3654L3.64889 11.019Z" fill="white" fill-opacity="0.05" mask="url(#path-1-inside-1_43_136)"/>
+                    <path d="M10.4444 4.88889L9.33611 11.1922C9.29089 11.4496 9.15638 11.6829 8.95621 11.851C8.75604 12.019 8.50303 12.1111 8.24167 12.1111H3.75833C3.49697 12.1111 3.24396 12.019 3.04379 11.851C2.84362 11.6829 2.70911 11.4496 2.66389 11.1922L1.55556 4.88889H10.4444ZM11 3.22222H7.875H11ZM1 3.22222H4.125H1ZM4.125 3.22222V2.11111C4.125 1.81643 4.24206 1.53381 4.45044 1.32544C4.65881 1.11706 4.94143 1 5.23611 1H6.76389C7.05857 1 7.34119 1.11706 7.54956 1.32544C7.75794 1.53381 7.875 1.81643 7.875 2.11111V3.22222M4.125 3.22222H7.875H4.125Z" fill="white" fill-opacity="0.05"/>
+                    <path d="M11 3.22222H7.875M7.875 3.22222V2.11111C7.875 1.81643 7.75794 1.53381 7.54956 1.32544C7.34119 1.11706 7.05857 1 6.76389 1H5.23611C4.94143 1 4.65881 1.11706 4.45044 1.32544C4.24206 1.53381 4.125 1.81643 4.125 2.11111V3.22222M7.875 3.22222H4.125M1 3.22222H4.125M10.4444 4.88889L9.33611 11.1922C9.29089 11.4496 9.15638 11.6829 8.95621 11.851C8.75604 12.019 8.50303 12.1111 8.24167 12.1111H3.75833C3.49697 12.1111 3.24396 12.019 3.04379 11.851C2.84362 11.6829 2.70911 11.4496 2.66389 11.1922L1.55556 4.88889H10.4444Z" stroke="white" stroke-opacity="0.05" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <svg @click="deletePreset(preset.title, index)" xmlns="http://www.w3.org/2000/svg" width=".625vw" height="0.9259vh" viewBox="0 0 12 10" fill="none" 
+                    class="svg-menu">
+                    <path d="M7 1L11 5L7 9M1 1L5 5L1 9" stroke="white" stroke-opacity="0.05" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="w-full h-[5%] "></div>
+            <div class="flex justify-between w-full h-[7%] pr-[0.5vw]">
+              <div class="flex gap-x-[.4604vw] w-fit h-fit">
+                <svg xmlns="http://www.w3.org/2000/svg" width="2.3438vw" height="2.3148vh" viewBox="0 0 45 25" fill="none">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M8.99996 15.909C11.4852 15.909 13.5 17.9442 13.5 20.4545C13.5 22.9649 11.4852 25 8.99996 25C6.51469 25 4.50003 22.9649 4.50003 20.4545C4.50003 17.9442 6.51469 15.909 8.99996 15.909ZM34.875 15.909C37.3603 15.909 39.3749 17.9442 39.3749 20.4545C39.3749 22.9649 37.3603 25 34.875 25C32.3897 25 30.375 22.9649 30.375 20.4545C30.375 17.9442 32.3897 15.909 34.875 15.909ZM28.125 20.4545C28.125 21.2514 28.2603 22.0164 28.5091 22.7273H15.3658C15.6209 21.9973 15.7508 21.2287 15.75 20.4545C15.75 19.6576 15.6146 18.8926 15.3658 18.1817H28.5091C28.2541 18.9117 28.1242 19.6804 28.125 20.4545ZM25.4999 0L26.1 0.454582L34.7333 6.99544L41.5914 8.72833C43.4768 9.20453 44.8325 10.843 44.9855 12.773L45 13.1381V21.0927L43.2956 21.5231L41.4535 21.9883C41.5678 21.4852 41.6253 20.9707 41.625 20.4545C41.625 19.0605 41.2108 17.7643 40.5001 16.6845L40.5 13.1381L33.2043 11.2958L32.7634 11.1845L32.6754 11.1177L31.5 12.305C30.6561 13.1574 29.5115 13.6363 28.318 13.6363L4.49993 13.6362V15.3726C3.11902 16.621 2.24996 18.4353 2.24996 20.4545C2.24996 20.8001 2.27549 21.1396 2.32453 21.4714L0 19.1232V8.2681L0.521542 7.63593L6.1465 0.817756L6.82119 0H25.4999ZM24.0008 4.54548H8.92803L5.17862 9.09086H28.318L29.0389 8.3626L24.0008 4.54548Z" fill="white"/>
+                </svg>
+                <div class="w-fit h-fit">
+                  <p class="text-white [font-family:Gilroy-SemiBold] text-[.8333vw] font-normal leading-[1vh]">{{currentVehicleName}}</p>
+                  <p class="text-[rgba(255,255,255,0.50)] [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[normal]">{{currentVehiclePlate}}</p>
+                </div>
+              </div>
+              <svg @click="exitUI" xmlns="http://www.w3.org/2000/svg" width=".8854vw" height="1.6667vh" viewBox="0 0 17 18" fill="none">
+                <path d="M8 0C8.25488 0.000282707 8.50003 0.0978791 8.68537 0.272848C8.8707 0.447818 8.98223 0.686953 8.99717 0.941395C9.01211 1.19584 8.92933 1.44638 8.76574 1.64183C8.60215 1.83729 8.3701 1.9629 8.117 1.993L8 2H3C2.75507 2.00003 2.51866 2.08996 2.33563 2.25272C2.15259 2.41547 2.03566 2.63975 2.007 2.883L2 3V15C2.00003 15.2449 2.08996 15.4813 2.25272 15.6644C2.41547 15.8474 2.63975 15.9643 2.883 15.993L3 16H7.5C7.75488 16.0003 8.00003 16.0979 8.18537 16.2728C8.3707 16.4478 8.48223 16.687 8.49717 16.9414C8.51211 17.1958 8.42933 17.4464 8.26574 17.6418C8.10215 17.8373 7.8701 17.9629 7.617 17.993L7.5 18H3C2.23479 18 1.49849 17.7077 0.941739 17.1827C0.384993 16.6578 0.0498925 15.9399 0.00500012 15.176L4.66045e-09 15V3C-4.26217e-05 2.23479 0.292325 1.49849 0.817284 0.941739C1.34224 0.384993 2.06011 0.0498925 2.824 0.00500011L3 0H8ZM13.707 5.464L16.535 8.293C16.7225 8.48053 16.8278 8.73484 16.8278 9C16.8278 9.26516 16.7225 9.51947 16.535 9.707L13.707 12.536C13.5194 12.7235 13.2649 12.8288 12.9996 12.8287C12.7344 12.8286 12.48 12.7231 12.2925 12.5355C12.105 12.3479 11.9997 12.0934 11.9998 11.8281C11.9999 11.5629 12.1054 11.3085 12.293 11.121L13.414 10H8C7.73478 10 7.48043 9.89464 7.29289 9.70711C7.10536 9.51957 7 9.26522 7 9C7 8.73478 7.10536 8.48043 7.29289 8.29289C7.48043 8.10536 7.73478 8 8 8H13.414L12.293 6.879C12.1054 6.69149 11.9999 6.43712 11.9998 6.17185C11.9997 5.90658 12.105 5.65214 12.2925 5.4645C12.48 5.27686 12.7344 5.17139 12.9996 5.1713C13.2649 5.1712 13.5194 5.27649 13.707 5.464Z" fill="white"/>
+              </svg>
+            </div>
+          </div>
+          <div class="w-[49.2188vw] h-full px-[1.7188vw]">
+            <div class="flex justify-between items-center w-full h-[12%]">
+              <div class="w-fit h-fit">
+                  <p v-if="currentPage !== 'Advanced Configuration'" class="text-white [font-family:Gilroy-SemiBold] text-[1.0417vw] font-normal leading-[125%] tracking-[-0.4px]">
+                    {{ currentPage }}
+                  </p>
+                  <p v-if="currentPage !== 'Advanced Configuration'" class="text-[rgba(255,255,255,0.50)] [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px]">
+                    {{ currentPageDescription }}
+                  </p>
+                  <p v-if="currentPage === 'Advanced Configuration'" class="text-white [font-family:Gilroy-SemiBold] text-[1.0417vw] font-normal leading-[125%] tracking-[-0.4px]">
+                    {{ currentSubPage }}
+                  </p>
+                  <p v-if="currentPage === 'Advanced Configuration'" class="text-[rgba(255,255,255,0.50)] [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px]">
+                    {{ currentSubPageDescription }}
+                  </p>
+              </div>
+              <div class="flex gap-x-[.8208vw] w-fit h-fit">
+                <p class="flex gap-[.2604vw] items-center text-white [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px]">
+                  <svg xmlns="http://www.w3.org/2000/svg" width=".9375vw" height="1.2963vh" viewBox="0 0 18 14" fill="none">
+                    <path d="M9 14.0013C10.1046 14.0013 11 13.1059 11 12.0013C11 10.8967 10.1046 10.0013 9 10.0013C7.89543 10.0013 7 10.8967 7 12.0013C7 13.1059 7.89543 14.0013 9 14.0013Z" fill="white"/>
+                    <path d="M0 4.40131C1.1261 3.01802 2.51102 1.91016 4.06275 1.15131C5.61447 0.39246 7.29749 0 9 0C10.7025 0 12.3855 0.39246 13.9373 1.15131C15.489 1.91016 16.8739 3.01802 18 4.40131L16.5 5.80131C15.5616 4.62019 14.4075 3.67425 13.1144 3.02631C11.8213 2.37837 10.4188 2.04327 9 2.04327C7.58124 2.04327 6.17873 2.37837 4.88562 3.02631C3.59251 3.67425 2.43842 4.62019 1.5 5.80131L0 4.40131ZM3.7 7.60131C4.35709 6.78917 5.17628 6.13642 6.10034 5.68866C7.0244 5.2409 8.03106 5.00892 9.05 5.00892C10.0689 5.00892 11.0756 5.2409 11.9997 5.68866C12.9237 6.13642 13.7429 6.78917 14.4 7.60131L13 9.00131C12.5315 8.3823 11.9378 7.88272 11.2628 7.53944C10.5878 7.19616 9.84868 7.01794 9.1 7.01794C8.35132 7.01794 7.6122 7.19616 6.93719 7.53944C6.26218 7.88272 5.66851 8.3823 5.2 9.00131L3.7 7.60131Z" fill="white"/>
+                  </svg>
+                  Connected</p>
+                <p class="text-white [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px]">{{currentTime}}</p>
+              </div>
+            </div>
+            <div class="flex flex-col w-fit h-[87%]  gap-y-[2.3148vh]" v-if="currentPage == 'Simple Configuration'">
+              <div class="flex flex-col w-full h-[47.5vh] gap-y-[1.8519vh] overflow-x-auto items-center">
+                <div class="flex flex-col w-full h-[7.963vh] gap-[0.463vh]"
+                v-for="(item, index) in SimpleConfiguration" 
+                :key="index" 
+                >
+                  <div class="flex items-end justify-between w-full h-fit">
+                    <div class="flex items-center w-fit h-full gap-x-[.5208vw]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="1.4815vh" height="1.0417vw" viewBox="0 0 16 20" fill="none">
+                        <path d="M0 19.4V13.475C0 13.1417 0.0793332 12.825 0.238 12.525C0.396667 12.225 0.617333 11.9833 0.9 11.8L2 11.075C2.11667 12.475 2.3 13.6667 2.55 14.65C2.8 15.6333 3.19167 16.725 3.725 17.925L0 19.4ZM5.225 17.4C4.64167 16.3 4.20833 15.1333 3.925 13.9C3.64167 12.6667 3.5 11.3917 3.5 10.075C3.5 7.99167 3.91267 6.02933 4.738 4.188C5.56333 2.34667 6.65067 0.950667 8 0C9.35 0.95 10.4377 2.346 11.263 4.188C12.0883 6.03 12.5007 7.99233 12.5 10.075C12.5 11.375 12.3583 12.6377 12.075 13.863C11.7917 15.0883 11.3583 16.2673 10.775 17.4H5.225ZM8 10.4C8.55 10.4 9.021 10.2043 9.413 9.813C9.805 9.42167 10.0007 8.95067 10 8.4C9.99933 7.84933 9.80367 7.37867 9.413 6.988C9.02233 6.59733 8.55133 6.40133 8 6.4C7.44867 6.39867 6.978 6.59467 6.588 6.988C6.198 7.38133 6.002 7.852 6 8.4C5.998 8.948 6.194 9.419 6.588 9.813C6.982 10.207 7.45267 10.4027 8 10.4ZM16 19.4L12.275 17.925C12.8083 16.725 13.2 15.6333 13.45 14.65C13.7 13.6667 13.8833 12.475 14 11.075L15.1 11.8C15.3833 11.9833 15.6043 12.225 15.763 12.525C15.9217 12.825 16.0007 13.1417 16 13.475V19.4Z" fill="white"/>
+                      </svg>
+                      <div class="w-fit h-fit ">
+                        <p class="text-white [font-family:Gilroy-SemiBold] text-[.8333vw] font-normal leading-[normal]">{{ item.title }}</p>
+                        <p class="text-[rgba(255,255,255,0.50)] [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px]"> {{ item.description }}</p>
+                      </div>
+                    </div>
+                    <p class="text-[rgba(255,255,255,0.50)] [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px] mr-[0.3vw]">{{ item[item.modal] }}</p>
+                  </div>
+                  <div class="flex items-end w-full h-fit">
+                    <div class="flex items-center justify-between w-[45.7292vw] h-[3.7963vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                      <div class="flex justify-center items-center w-[2.1354vw] h-[3.7963vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_0px_0px_5px]"   @click="decreaseValue(item)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width=".7813vw" height="0.1852vh" viewBox="0 0 15 2" fill="none">
+                          <path d="M14.6752 1.99799H0.325195V-0.00201416H14.6752V1.99799Z" fill="white"/>
+                        </svg>
+                      </div>
+                      <input type="range" class="w-[38.8335vw] h-[0.463vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw] range"
+                      :min="item.minValue"
+                      :max="item.maxValue"
+                      :step="item.step"
+                      v-model="item[item.modal]"
+                      @input="onInputChange(item, item.modal)"
+                      >
+                      <div class="flex justify-center items-center w-[2.1354vw] h-[3.7963vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[0px_5px_5px_0px]" @click="increaseValue(item)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width=".7813vw" height="1.2963vh" viewBox="0 0 15 14" fill="none">
+                          <path d="M14.6752 7.99799H8.5252V13.998H6.4752V7.99799H0.325195V5.99799H6.4752V-0.00201416H8.5252V5.99799H14.6752V7.99799Z" fill="white"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex w-full h-[20%] gap-[.8854vw] ">
+                <div class="w-[12.0313vw] h-[13.4259vh]">
+                  <div class="w-[12.0313vw] h-[11.5741vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex items-center px-[0.9vw] gap-[.3125vw] w-full h-[25%]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".625vw" height="1.1111vh" viewBox="0 0 12 12" fill="none">
+                        <path d="M12 12H0V10.6667H12V12ZM3.33333 4.66667H0.666667V9.33333H3.33333V4.66667ZM7.33333 0H4.66667V9.33333H7.33333V0ZM11.3333 2H8.66667V9.33333H11.3333V2Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]"> {{ Locales["vehiclestats"] }}</p>
+                    </div>
+                    <div class="flex justify-evenly w-full h-[75%] ">
+                      <div class="flex items-end w-[1.9503vw] h-[8.6294vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_5px_0px_0px]">
+                        <div class="w-full h-[70%] [background:linear-gradient(0deg,#1C202E_0%,#FFF_100%)] rounded-[5px_5px_0px_0px]" :style="{ height: currentVehicleAcceleration + '%'}"></div>
+                      </div>
+                      <div class="flex items-end w-[1.9503vw] h-[8.6294vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_5px_0px_0px]">
+                        <div class="w-full h-[70%] [background:linear-gradient(0deg,#1C202E_0%,#FFF_100%)] rounded-[5px_5px_0px_0px]" :style="{ height: currentVehicleTopSpeed + '%'}"></div>
+                      </div>
+                      <div class="flex items-end w-[1.9503vw] h-[8.6294vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_5px_0px_0px]">
+                        <div class="w-full h-[70%] [background:linear-gradient(0deg,#1C202E_0%,#FFF_100%)] rounded-[5px_5px_0px_0px]" :style="{ height: currentVehicleTraction + '%'}"></div>
+                      </div>
+                      <div class="flex items-end w-[1.9503vw] h-[8.6294vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_5px_0px_0px]">
+                        <div class="w-full h-[70%] [background:linear-gradient(0deg,#1C202E_0%,#FFF_100%)] rounded-[5px_5px_0px_0px]" :style="{ height: currentVehicleBraking + '%'}"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center w-full h-fit gap-[.7813vw] px-[.2604vw]">
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.5208vw] font-normal leading-[normal]">{{ Locales["acceleration"] }}</p>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.5208vw] font-normal leading-[normal]">{{ Locales["speed"] }}</p>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.5208vw] font-normal leading-[normal]">{{ Locales["handling"] }}</p>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.5208vw] font-normal leading-[normal]">{{ Locales["braking"] }}</p>
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-x-[.525vw] gap-y-[1vh] w-[10.7813vw] h-[13.1481vh] ">
+                  <div class="flex flex-col justify-evenly items-center w-[5.0521vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex gap-[.2604vw] w-fit h-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".4167vw" height="1.2963vh" viewBox="0 0 8 14" fill="none">
+                        <path d="M5.76111 7.72656V1.95106C5.75649 1.43228 5.52875 0.935416 5.12598 0.56537C4.90578 0.368428 4.64126 0.216523 4.35034 0.119949C4.05942 0.0233752 3.74891 -0.0156102 3.43984 0.00563495C2.88047 0.0553983 2.36252 0.293982 1.98962 0.673664C1.61671 1.05335 1.41634 1.54613 1.42858 2.05345L1.43614 7.7054C0.882525 8.08079 0.460751 8.5925 0.221491 9.17905C-0.0177691 9.7656 -0.0643375 10.402 0.0873811 11.0119C0.2391 11.6218 0.582651 12.1791 1.07676 12.617C1.57086 13.0549 2.19451 13.3546 2.87275 13.4802C3.10947 13.5213 3.35 13.5419 3.59106 13.5417C4.5443 13.5417 5.4586 13.2003 6.13335 12.5924C6.80809 11.9845 7.18817 11.1599 7.19017 10.2993C7.19154 9.79943 7.06295 9.30625 6.81475 8.85941C6.56655 8.41258 6.20566 8.02456 5.76111 7.72656ZM5.39818 12.2727C5.06987 12.5155 4.68579 12.6893 4.27381 12.7814C3.86183 12.8735 3.4323 12.8816 3.01642 12.8051C2.46447 12.7059 1.9585 12.4587 1.56461 12.0958C1.17073 11.7329 0.907237 11.2712 0.808561 10.771C0.710716 10.3019 0.760115 9.81742 0.951179 9.37233C1.14224 8.92724 1.46736 8.53924 1.8898 8.25217C1.98099 8.19142 2.05516 8.11224 2.10637 8.02097C2.15758 7.9297 2.1844 7.82887 2.18469 7.72656V2.05345C2.17632 1.71995 2.30556 1.39555 2.54729 1.14326C2.78903 0.890966 3.126 0.728792 3.49277 0.688239C3.52771 0.682767 3.56317 0.68048 3.59862 0.681413C3.9704 0.684964 4.32583 0.81987 4.58873 1.05721C4.85163 1.29455 5.00106 1.61543 5.005 1.95106V7.72656C5.00529 7.82887 5.03211 7.9297 5.08332 8.02097C5.13452 8.11224 5.20869 8.19142 5.29988 8.25217C5.64351 8.48433 5.92412 8.78402 6.12049 9.12856C6.31685 9.4731 6.42382 9.85346 6.43329 10.2408C6.44276 10.6282 6.35449 11.0125 6.17515 11.3645C5.99582 11.7165 5.73012 12.0271 5.39818 12.2727Z" fill="white"/>
+                        <path d="M5.02757 10.2993C5.02757 10.6415 4.87701 10.9696 4.60901 11.2116C4.34101 11.4535 3.97752 11.5894 3.59851 11.5894C3.2195 11.5894 2.85602 11.4535 2.58802 11.2116C2.32002 10.9696 2.16946 10.6415 2.16946 10.2993C2.16772 10.0172 2.27008 9.74265 2.46039 9.51893C2.65071 9.2952 2.91813 9.13506 3.22046 9.06379V2.26574C3.22046 2.17522 3.26029 2.08841 3.33119 2.0244C3.40208 1.9604 3.49825 1.92444 3.59851 1.92444C3.69878 1.92444 3.79494 1.9604 3.86584 2.0244C3.93674 2.08841 3.97657 2.17522 3.97657 2.26574V9.06447C4.27812 9.13677 4.54471 9.29709 4.73481 9.52044C4.92491 9.74379 5.02784 10.0176 5.02757 10.2993Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]">{{ Locales["oiltemp"] }}</p>
+                    </div>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.9375vw] font-normal leading-[normal]">{{currentVehicleFuelLevel}}L</p>
+                    <div></div>
+                  </div>
+                  <div class="flex flex-col justify-evenly items-center w-[5.0521vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex gap-[.2604vw] w-fit h-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".4167vw" height="1.2963vh" viewBox="0 0 8 14" fill="none">
+                        <path d="M5.76111 7.72656V1.95106C5.75649 1.43228 5.52875 0.935416 5.12598 0.56537C4.90578 0.368428 4.64126 0.216523 4.35034 0.119949C4.05942 0.0233752 3.74891 -0.0156102 3.43984 0.00563495C2.88047 0.0553983 2.36252 0.293982 1.98962 0.673664C1.61671 1.05335 1.41634 1.54613 1.42858 2.05345L1.43614 7.7054C0.882525 8.08079 0.460751 8.5925 0.221491 9.17905C-0.0177691 9.7656 -0.0643375 10.402 0.0873811 11.0119C0.2391 11.6218 0.582651 12.1791 1.07676 12.617C1.57086 13.0549 2.19451 13.3546 2.87275 13.4802C3.10947 13.5213 3.35 13.5419 3.59106 13.5417C4.5443 13.5417 5.4586 13.2003 6.13335 12.5924C6.80809 11.9845 7.18817 11.1599 7.19017 10.2993C7.19154 9.79943 7.06295 9.30625 6.81475 8.85941C6.56655 8.41258 6.20566 8.02456 5.76111 7.72656ZM5.39818 12.2727C5.06987 12.5155 4.68579 12.6893 4.27381 12.7814C3.86183 12.8735 3.4323 12.8816 3.01642 12.8051C2.46447 12.7059 1.9585 12.4587 1.56461 12.0958C1.17073 11.7329 0.907237 11.2712 0.808561 10.771C0.710716 10.3019 0.760115 9.81742 0.951179 9.37233C1.14224 8.92724 1.46736 8.53924 1.8898 8.25217C1.98099 8.19142 2.05516 8.11224 2.10637 8.02097C2.15758 7.9297 2.1844 7.82887 2.18469 7.72656V2.05345C2.17632 1.71995 2.30556 1.39555 2.54729 1.14326C2.78903 0.890966 3.126 0.728792 3.49277 0.688239C3.52771 0.682767 3.56317 0.68048 3.59862 0.681413C3.9704 0.684964 4.32583 0.81987 4.58873 1.05721C4.85163 1.29455 5.00106 1.61543 5.005 1.95106V7.72656C5.00529 7.82887 5.03211 7.9297 5.08332 8.02097C5.13452 8.11224 5.20869 8.19142 5.29988 8.25217C5.64351 8.48433 5.92412 8.78402 6.12049 9.12856C6.31685 9.4731 6.42382 9.85346 6.43329 10.2408C6.44276 10.6282 6.35449 11.0125 6.17515 11.3645C5.99582 11.7165 5.73012 12.0271 5.39818 12.2727Z" fill="white"/>
+                        <path d="M5.02757 10.2993C5.02757 10.6415 4.87701 10.9696 4.60901 11.2116C4.34101 11.4535 3.97752 11.5894 3.59851 11.5894C3.2195 11.5894 2.85602 11.4535 2.58802 11.2116C2.32002 10.9696 2.16946 10.6415 2.16946 10.2993C2.16772 10.0172 2.27008 9.74265 2.46039 9.51893C2.65071 9.2952 2.91813 9.13506 3.22046 9.06379V2.26574C3.22046 2.17522 3.26029 2.08841 3.33119 2.0244C3.40208 1.9604 3.49825 1.92444 3.59851 1.92444C3.69878 1.92444 3.79494 1.9604 3.86584 2.0244C3.93674 2.08841 3.97657 2.17522 3.97657 2.26574V9.06447C4.27812 9.13677 4.54471 9.29709 4.73481 9.52044C4.92491 9.74379 5.02784 10.0176 5.02757 10.2993Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]">{{ Locales["dashtemp"] }}</p>
+                    </div>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.9375vw] font-normal leading-[normal]">{{currentVehicleHealth}}</p>
+                    <div></div>
+                  </div>
+                  <div class="flex flex-col justify-evenly items-center w-[5.0521vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex gap-[.2604vw] w-fit h-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".4167vw" height="1.2963vh" viewBox="0 0 8 14" fill="none">
+                        <path d="M5.76111 7.72656V1.95106C5.75649 1.43228 5.52875 0.935416 5.12598 0.56537C4.90578 0.368428 4.64126 0.216523 4.35034 0.119949C4.05942 0.0233752 3.74891 -0.0156102 3.43984 0.00563495C2.88047 0.0553983 2.36252 0.293982 1.98962 0.673664C1.61671 1.05335 1.41634 1.54613 1.42858 2.05345L1.43614 7.7054C0.882525 8.08079 0.460751 8.5925 0.221491 9.17905C-0.0177691 9.7656 -0.0643375 10.402 0.0873811 11.0119C0.2391 11.6218 0.582651 12.1791 1.07676 12.617C1.57086 13.0549 2.19451 13.3546 2.87275 13.4802C3.10947 13.5213 3.35 13.5419 3.59106 13.5417C4.5443 13.5417 5.4586 13.2003 6.13335 12.5924C6.80809 11.9845 7.18817 11.1599 7.19017 10.2993C7.19154 9.79943 7.06295 9.30625 6.81475 8.85941C6.56655 8.41258 6.20566 8.02456 5.76111 7.72656ZM5.39818 12.2727C5.06987 12.5155 4.68579 12.6893 4.27381 12.7814C3.86183 12.8735 3.4323 12.8816 3.01642 12.8051C2.46447 12.7059 1.9585 12.4587 1.56461 12.0958C1.17073 11.7329 0.907237 11.2712 0.808561 10.771C0.710716 10.3019 0.760115 9.81742 0.951179 9.37233C1.14224 8.92724 1.46736 8.53924 1.8898 8.25217C1.98099 8.19142 2.05516 8.11224 2.10637 8.02097C2.15758 7.9297 2.1844 7.82887 2.18469 7.72656V2.05345C2.17632 1.71995 2.30556 1.39555 2.54729 1.14326C2.78903 0.890966 3.126 0.728792 3.49277 0.688239C3.52771 0.682767 3.56317 0.68048 3.59862 0.681413C3.9704 0.684964 4.32583 0.81987 4.58873 1.05721C4.85163 1.29455 5.00106 1.61543 5.005 1.95106V7.72656C5.00529 7.82887 5.03211 7.9297 5.08332 8.02097C5.13452 8.11224 5.20869 8.19142 5.29988 8.25217C5.64351 8.48433 5.92412 8.78402 6.12049 9.12856C6.31685 9.4731 6.42382 9.85346 6.43329 10.2408C6.44276 10.6282 6.35449 11.0125 6.17515 11.3645C5.99582 11.7165 5.73012 12.0271 5.39818 12.2727Z" fill="white"/>
+                        <path d="M5.02757 10.2993C5.02757 10.6415 4.87701 10.9696 4.60901 11.2116C4.34101 11.4535 3.97752 11.5894 3.59851 11.5894C3.2195 11.5894 2.85602 11.4535 2.58802 11.2116C2.32002 10.9696 2.16946 10.6415 2.16946 10.2993C2.16772 10.0172 2.27008 9.74265 2.46039 9.51893C2.65071 9.2952 2.91813 9.13506 3.22046 9.06379V2.26574C3.22046 2.17522 3.26029 2.08841 3.33119 2.0244C3.40208 1.9604 3.49825 1.92444 3.59851 1.92444C3.69878 1.92444 3.79494 1.9604 3.86584 2.0244C3.93674 2.08841 3.97657 2.17522 3.97657 2.26574V9.06447C4.27812 9.13677 4.54471 9.29709 4.73481 9.52044C4.92491 9.74379 5.02784 10.0176 5.02757 10.2993Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]">{{ Locales["watertemp"] }}</p>
+                    </div>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.9375vw] font-normal leading-[normal]">{{currentVehicleOilLevel}}°</p>
+                    <div></div>
+                  </div>
+                  <div class="flex flex-col justify-evenly items-center w-[5.0521vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex gap-[.2604vw] w-fit h-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".4167vw" height="1.2963vh" viewBox="0 0 8 14" fill="none">
+                        <path d="M5.76111 7.72656V1.95106C5.75649 1.43228 5.52875 0.935416 5.12598 0.56537C4.90578 0.368428 4.64126 0.216523 4.35034 0.119949C4.05942 0.0233752 3.74891 -0.0156102 3.43984 0.00563495C2.88047 0.0553983 2.36252 0.293982 1.98962 0.673664C1.61671 1.05335 1.41634 1.54613 1.42858 2.05345L1.43614 7.7054C0.882525 8.08079 0.460751 8.5925 0.221491 9.17905C-0.0177691 9.7656 -0.0643375 10.402 0.0873811 11.0119C0.2391 11.6218 0.582651 12.1791 1.07676 12.617C1.57086 13.0549 2.19451 13.3546 2.87275 13.4802C3.10947 13.5213 3.35 13.5419 3.59106 13.5417C4.5443 13.5417 5.4586 13.2003 6.13335 12.5924C6.80809 11.9845 7.18817 11.1599 7.19017 10.2993C7.19154 9.79943 7.06295 9.30625 6.81475 8.85941C6.56655 8.41258 6.20566 8.02456 5.76111 7.72656ZM5.39818 12.2727C5.06987 12.5155 4.68579 12.6893 4.27381 12.7814C3.86183 12.8735 3.4323 12.8816 3.01642 12.8051C2.46447 12.7059 1.9585 12.4587 1.56461 12.0958C1.17073 11.7329 0.907237 11.2712 0.808561 10.771C0.710716 10.3019 0.760115 9.81742 0.951179 9.37233C1.14224 8.92724 1.46736 8.53924 1.8898 8.25217C1.98099 8.19142 2.05516 8.11224 2.10637 8.02097C2.15758 7.9297 2.1844 7.82887 2.18469 7.72656V2.05345C2.17632 1.71995 2.30556 1.39555 2.54729 1.14326C2.78903 0.890966 3.126 0.728792 3.49277 0.688239C3.52771 0.682767 3.56317 0.68048 3.59862 0.681413C3.9704 0.684964 4.32583 0.81987 4.58873 1.05721C4.85163 1.29455 5.00106 1.61543 5.005 1.95106V7.72656C5.00529 7.82887 5.03211 7.9297 5.08332 8.02097C5.13452 8.11224 5.20869 8.19142 5.29988 8.25217C5.64351 8.48433 5.92412 8.78402 6.12049 9.12856C6.31685 9.4731 6.42382 9.85346 6.43329 10.2408C6.44276 10.6282 6.35449 11.0125 6.17515 11.3645C5.99582 11.7165 5.73012 12.0271 5.39818 12.2727Z" fill="white"/>
+                        <path d="M5.02757 10.2993C5.02757 10.6415 4.87701 10.9696 4.60901 11.2116C4.34101 11.4535 3.97752 11.5894 3.59851 11.5894C3.2195 11.5894 2.85602 11.4535 2.58802 11.2116C2.32002 10.9696 2.16946 10.6415 2.16946 10.2993C2.16772 10.0172 2.27008 9.74265 2.46039 9.51893C2.65071 9.2952 2.91813 9.13506 3.22046 9.06379V2.26574C3.22046 2.17522 3.26029 2.08841 3.33119 2.0244C3.40208 1.9604 3.49825 1.92444 3.59851 1.92444C3.69878 1.92444 3.79494 1.9604 3.86584 2.0244C3.93674 2.08841 3.97657 2.17522 3.97657 2.26574V9.06447C4.27812 9.13677 4.54471 9.29709 4.73481 9.52044C4.92491 9.74379 5.02784 10.0176 5.02757 10.2993Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]">{{ Locales["enginetemp"] }}</p>
+                    </div>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.9375vw] font-normal leading-[normal]">{{parseFloat(this.currentVehicleEngineTemp.toFixed(0))}}°</p>
+                    <div></div>
+                  </div>
+            
+                </div>
+                <div class="ml-[.3125vw] flex flex-col w-[20.7292vw] h-full flex items-start gap-[1.8519vh]">
+                  <div class="flex justify-center items-center gap-[.6771vw] w-[20.7292vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw] ">
+                    
+                    <p class="w-[18.0729vw] text-[rgba(255,255,255,0.80)] [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px]">{{ Locales["confirmtext"] }}</p>
+                  </div>
+                  <div class="flex justify-between w-[20.7292vw]  h-fit">
+                    <div class="flex justify-center items-center w-[9.6243vw] h-[4.3519vh] shrink-0 [background:rgba(255,255,255,0.05)] rounded-[.2604vw] text-white text-center [font-family:Gilroy-SemiBold] text-[.7292vw] font-normal leading-[normal]" @click="resetSettings">Reset it</div>
+                    <div class="flex justify-center items-center w-[9.6243vw] h-[4.3519vh] shrink-0 [background:#FFF] rounded-[.2604vw] text-black text-center [font-family:Gilroy-SemiBold] text-[.7292vw] font-normal leading-[normal]" @click="applySettingsSimple">
+                      Apply
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex flex-col w-fit h-[87%]  gap-y-[2.3148vh]" v-if="currentPage == 'Advanced Configuration'">
+              <div class="flex flex-col w-full h-[47.5vh] gap-y-[1.8519vh] overflow-x-auto items-center">
+                
+                <div class="flex flex-col w-full h-[7.963vh] gap-[0.463vh]"
+                v-for="(item, index) in filteredConfiguration" 
+                :key="index" 
+                >
+                  <div class="flex items-end justify-between w-full h-fit">
+                    <div class="flex items-center w-fit h-full gap-x-[.5208vw]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="1.4815vh" height="1.0417vw" viewBox="0 0 16 20" fill="none">
+                        <path d="M0 19.4V13.475C0 13.1417 0.0793332 12.825 0.238 12.525C0.396667 12.225 0.617333 11.9833 0.9 11.8L2 11.075C2.11667 12.475 2.3 13.6667 2.55 14.65C2.8 15.6333 3.19167 16.725 3.725 17.925L0 19.4ZM5.225 17.4C4.64167 16.3 4.20833 15.1333 3.925 13.9C3.64167 12.6667 3.5 11.3917 3.5 10.075C3.5 7.99167 3.91267 6.02933 4.738 4.188C5.56333 2.34667 6.65067 0.950667 8 0C9.35 0.95 10.4377 2.346 11.263 4.188C12.0883 6.03 12.5007 7.99233 12.5 10.075C12.5 11.375 12.3583 12.6377 12.075 13.863C11.7917 15.0883 11.3583 16.2673 10.775 17.4H5.225ZM8 10.4C8.55 10.4 9.021 10.2043 9.413 9.813C9.805 9.42167 10.0007 8.95067 10 8.4C9.99933 7.84933 9.80367 7.37867 9.413 6.988C9.02233 6.59733 8.55133 6.40133 8 6.4C7.44867 6.39867 6.978 6.59467 6.588 6.988C6.198 7.38133 6.002 7.852 6 8.4C5.998 8.948 6.194 9.419 6.588 9.813C6.982 10.207 7.45267 10.4027 8 10.4ZM16 19.4L12.275 17.925C12.8083 16.725 13.2 15.6333 13.45 14.65C13.7 13.6667 13.8833 12.475 14 11.075L15.1 11.8C15.3833 11.9833 15.6043 12.225 15.763 12.525C15.9217 12.825 16.0007 13.1417 16 13.475V19.4Z" fill="white"/>
+                      </svg>
+                      <div class="w-fit h-fit ">
+                        <p class="text-white [font-family:Gilroy-SemiBold] text-[.8333vw] font-normal leading-[normal]">{{ item.title }}</p>
+                        <p class="text-[rgba(255,255,255,0.50)] [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px]"> {{ item.description }}</p>
+                      </div>
+                    </div>
+                    <p class="text-[rgba(255,255,255,0.50)] [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px] mr-[0.3vw]">{{ item[item.modal] }}</p>
+                  </div>
+                  <div class="flex items-end w-full h-fit">
+                    <div class="flex items-center justify-between w-[45.7292vw] h-[3.7963vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                      <div class="flex justify-center items-center w-[2.1354vw] h-[3.7963vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_0px_0px_5px]"   @click="decreaseValue(item)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width=".7813vw" height="0.1852vh" viewBox="0 0 15 2" fill="none">
+                          <path d="M14.6752 1.99799H0.325195V-0.00201416H14.6752V1.99799Z" fill="white"/>
+                        </svg>
+                      </div>
+                      <input type="range" class="w-[38.8335vw] h-[0.463vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw] range"
+                      :min="item.minValue"
+                      :max="item.maxValue"
+                      :step="item.step"
+                      v-model="item[item.modal]"
+                      @input="onInputChange(item, item.modal)"
+                      >
+                      <div class="flex justify-center items-center w-[2.1354vw] h-[3.7963vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[0px_5px_5px_0px]" @click="increaseValue(item)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width=".7813vw" height="1.2963vh" viewBox="0 0 15 14" fill="none">
+                          <path d="M14.6752 7.99799H8.5252V13.998H6.4752V7.99799H0.325195V5.99799H6.4752V-0.00201416H8.5252V5.99799H14.6752V7.99799Z" fill="white"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div v-if="filteredConfigurations.length < 5" class="w-fit h-[50%] flex flex-col justify-center items-center text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="3.3854vw" height="6.0185vh" viewBox="0 0 65 65" fill="none">
+                    <path d="M20.1769 47.2604L16.3853 43.4687L24.578 35.2083H5.4165V29.7916H24.578L16.3853 21.5312L20.1769 17.7396L34.9373 32.5L20.1769 47.2604ZM35.2082 46.0416V40.625H59.5832V46.0416H35.2082ZM35.2082 24.375V18.9583H59.5832V24.375H35.2082ZM43.3332 35.2083V29.7916H59.5832V35.2083H43.3332Z" fill="white" fill-opacity="0.5"/>
+                  </svg>
+                  No More Data...
+                </div>
+              </div>
+              <div class="flex w-full h-[20%] gap-[.8854vw] ">
+                <div class="w-[12.0313vw] h-[13.4259vh]">
+                  <div class="w-[12.0313vw] h-[11.5741vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex items-center px-[0.9vw] gap-[.3125vw] w-full h-[25%]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".625vw" height="1.1111vh" viewBox="0 0 12 12" fill="none">
+                        <path d="M12 12H0V10.6667H12V12ZM3.33333 4.66667H0.666667V9.33333H3.33333V4.66667ZM7.33333 0H4.66667V9.33333H7.33333V0ZM11.3333 2H8.66667V9.33333H11.3333V2Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]"> {{ Locales["vehiclestats"] }}</p>
+                    </div>
+                    <div class="flex justify-evenly w-full h-[75%] ">
+                      <div class="flex items-end w-[1.9503vw] h-[8.6294vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_5px_0px_0px]">
+                        <div class="w-full h-[70%] [background:linear-gradient(0deg,#1C202E_0%,#FFF_100%)] rounded-[5px_5px_0px_0px]" :style="{ height: currentVehicleAcceleration + '%'}"></div>
+                      </div>
+                      <div class="flex items-end w-[1.9503vw] h-[8.6294vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_5px_0px_0px]">
+                        <div class="w-full h-[70%] [background:linear-gradient(0deg,#1C202E_0%,#FFF_100%)] rounded-[5px_5px_0px_0px]" :style="{ height: currentVehicleTopSpeed + '%'}"></div>
+                      </div>
+                      <div class="flex items-end w-[1.9503vw] h-[8.6294vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_5px_0px_0px]">
+                        <div class="w-full h-[70%] [background:linear-gradient(0deg,#1C202E_0%,#FFF_100%)] rounded-[5px_5px_0px_0px]" :style="{ height: currentVehicleTraction + '%'}"></div>
+                      </div>
+                      <div class="flex items-end w-[1.9503vw] h-[8.6294vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_5px_0px_0px]">
+                        <div class="w-full h-[70%] [background:linear-gradient(0deg,#1C202E_0%,#FFF_100%)] rounded-[5px_5px_0px_0px]" :style="{ height: currentVehicleBraking + '%'}"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center w-full h-fit gap-[.7813vw] px-[.2604vw]">
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.5208vw] font-normal leading-[normal]">{{ Locales["acceleration"] }}</p>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.5208vw] font-normal leading-[normal]">{{ Locales["speed"] }}</p>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.5208vw] font-normal leading-[normal]">{{ Locales["handling"] }}</p>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.5208vw] font-normal leading-[normal]">{{ Locales["braking"] }}</p>
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-x-[.525vw] gap-y-[1vh] w-[10.7813vw] h-[13.1481vh] ">
+                  <div class="flex flex-col justify-evenly items-center w-[5.0521vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex gap-[.2604vw] w-fit h-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".4167vw" height="1.2963vh" viewBox="0 0 8 14" fill="none">
+                        <path d="M5.76111 7.72656V1.95106C5.75649 1.43228 5.52875 0.935416 5.12598 0.56537C4.90578 0.368428 4.64126 0.216523 4.35034 0.119949C4.05942 0.0233752 3.74891 -0.0156102 3.43984 0.00563495C2.88047 0.0553983 2.36252 0.293982 1.98962 0.673664C1.61671 1.05335 1.41634 1.54613 1.42858 2.05345L1.43614 7.7054C0.882525 8.08079 0.460751 8.5925 0.221491 9.17905C-0.0177691 9.7656 -0.0643375 10.402 0.0873811 11.0119C0.2391 11.6218 0.582651 12.1791 1.07676 12.617C1.57086 13.0549 2.19451 13.3546 2.87275 13.4802C3.10947 13.5213 3.35 13.5419 3.59106 13.5417C4.5443 13.5417 5.4586 13.2003 6.13335 12.5924C6.80809 11.9845 7.18817 11.1599 7.19017 10.2993C7.19154 9.79943 7.06295 9.30625 6.81475 8.85941C6.56655 8.41258 6.20566 8.02456 5.76111 7.72656ZM5.39818 12.2727C5.06987 12.5155 4.68579 12.6893 4.27381 12.7814C3.86183 12.8735 3.4323 12.8816 3.01642 12.8051C2.46447 12.7059 1.9585 12.4587 1.56461 12.0958C1.17073 11.7329 0.907237 11.2712 0.808561 10.771C0.710716 10.3019 0.760115 9.81742 0.951179 9.37233C1.14224 8.92724 1.46736 8.53924 1.8898 8.25217C1.98099 8.19142 2.05516 8.11224 2.10637 8.02097C2.15758 7.9297 2.1844 7.82887 2.18469 7.72656V2.05345C2.17632 1.71995 2.30556 1.39555 2.54729 1.14326C2.78903 0.890966 3.126 0.728792 3.49277 0.688239C3.52771 0.682767 3.56317 0.68048 3.59862 0.681413C3.9704 0.684964 4.32583 0.81987 4.58873 1.05721C4.85163 1.29455 5.00106 1.61543 5.005 1.95106V7.72656C5.00529 7.82887 5.03211 7.9297 5.08332 8.02097C5.13452 8.11224 5.20869 8.19142 5.29988 8.25217C5.64351 8.48433 5.92412 8.78402 6.12049 9.12856C6.31685 9.4731 6.42382 9.85346 6.43329 10.2408C6.44276 10.6282 6.35449 11.0125 6.17515 11.3645C5.99582 11.7165 5.73012 12.0271 5.39818 12.2727Z" fill="white"/>
+                        <path d="M5.02757 10.2993C5.02757 10.6415 4.87701 10.9696 4.60901 11.2116C4.34101 11.4535 3.97752 11.5894 3.59851 11.5894C3.2195 11.5894 2.85602 11.4535 2.58802 11.2116C2.32002 10.9696 2.16946 10.6415 2.16946 10.2993C2.16772 10.0172 2.27008 9.74265 2.46039 9.51893C2.65071 9.2952 2.91813 9.13506 3.22046 9.06379V2.26574C3.22046 2.17522 3.26029 2.08841 3.33119 2.0244C3.40208 1.9604 3.49825 1.92444 3.59851 1.92444C3.69878 1.92444 3.79494 1.9604 3.86584 2.0244C3.93674 2.08841 3.97657 2.17522 3.97657 2.26574V9.06447C4.27812 9.13677 4.54471 9.29709 4.73481 9.52044C4.92491 9.74379 5.02784 10.0176 5.02757 10.2993Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]">{{ Locales["oiltemp"] }}</p>
+                    </div>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.9375vw] font-normal leading-[normal]">{{currentVehicleFuelLevel}}L</p>
+                    <div></div>
+                  </div>
+                  <div class="flex flex-col justify-evenly items-center w-[5.0521vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex gap-[.2604vw] w-fit h-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".4167vw" height="1.2963vh" viewBox="0 0 8 14" fill="none">
+                        <path d="M5.76111 7.72656V1.95106C5.75649 1.43228 5.52875 0.935416 5.12598 0.56537C4.90578 0.368428 4.64126 0.216523 4.35034 0.119949C4.05942 0.0233752 3.74891 -0.0156102 3.43984 0.00563495C2.88047 0.0553983 2.36252 0.293982 1.98962 0.673664C1.61671 1.05335 1.41634 1.54613 1.42858 2.05345L1.43614 7.7054C0.882525 8.08079 0.460751 8.5925 0.221491 9.17905C-0.0177691 9.7656 -0.0643375 10.402 0.0873811 11.0119C0.2391 11.6218 0.582651 12.1791 1.07676 12.617C1.57086 13.0549 2.19451 13.3546 2.87275 13.4802C3.10947 13.5213 3.35 13.5419 3.59106 13.5417C4.5443 13.5417 5.4586 13.2003 6.13335 12.5924C6.80809 11.9845 7.18817 11.1599 7.19017 10.2993C7.19154 9.79943 7.06295 9.30625 6.81475 8.85941C6.56655 8.41258 6.20566 8.02456 5.76111 7.72656ZM5.39818 12.2727C5.06987 12.5155 4.68579 12.6893 4.27381 12.7814C3.86183 12.8735 3.4323 12.8816 3.01642 12.8051C2.46447 12.7059 1.9585 12.4587 1.56461 12.0958C1.17073 11.7329 0.907237 11.2712 0.808561 10.771C0.710716 10.3019 0.760115 9.81742 0.951179 9.37233C1.14224 8.92724 1.46736 8.53924 1.8898 8.25217C1.98099 8.19142 2.05516 8.11224 2.10637 8.02097C2.15758 7.9297 2.1844 7.82887 2.18469 7.72656V2.05345C2.17632 1.71995 2.30556 1.39555 2.54729 1.14326C2.78903 0.890966 3.126 0.728792 3.49277 0.688239C3.52771 0.682767 3.56317 0.68048 3.59862 0.681413C3.9704 0.684964 4.32583 0.81987 4.58873 1.05721C4.85163 1.29455 5.00106 1.61543 5.005 1.95106V7.72656C5.00529 7.82887 5.03211 7.9297 5.08332 8.02097C5.13452 8.11224 5.20869 8.19142 5.29988 8.25217C5.64351 8.48433 5.92412 8.78402 6.12049 9.12856C6.31685 9.4731 6.42382 9.85346 6.43329 10.2408C6.44276 10.6282 6.35449 11.0125 6.17515 11.3645C5.99582 11.7165 5.73012 12.0271 5.39818 12.2727Z" fill="white"/>
+                        <path d="M5.02757 10.2993C5.02757 10.6415 4.87701 10.9696 4.60901 11.2116C4.34101 11.4535 3.97752 11.5894 3.59851 11.5894C3.2195 11.5894 2.85602 11.4535 2.58802 11.2116C2.32002 10.9696 2.16946 10.6415 2.16946 10.2993C2.16772 10.0172 2.27008 9.74265 2.46039 9.51893C2.65071 9.2952 2.91813 9.13506 3.22046 9.06379V2.26574C3.22046 2.17522 3.26029 2.08841 3.33119 2.0244C3.40208 1.9604 3.49825 1.92444 3.59851 1.92444C3.69878 1.92444 3.79494 1.9604 3.86584 2.0244C3.93674 2.08841 3.97657 2.17522 3.97657 2.26574V9.06447C4.27812 9.13677 4.54471 9.29709 4.73481 9.52044C4.92491 9.74379 5.02784 10.0176 5.02757 10.2993Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]">{{ Locales["dashtemp"] }}</p>
+                    </div>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.9375vw] font-normal leading-[normal]">{{currentVehicleHealth}}</p>
+                    <div></div>
+                  </div>
+                  <div class="flex flex-col justify-evenly items-center w-[5.0521vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex gap-[.2604vw] w-fit h-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".4167vw" height="1.2963vh" viewBox="0 0 8 14" fill="none">
+                        <path d="M5.76111 7.72656V1.95106C5.75649 1.43228 5.52875 0.935416 5.12598 0.56537C4.90578 0.368428 4.64126 0.216523 4.35034 0.119949C4.05942 0.0233752 3.74891 -0.0156102 3.43984 0.00563495C2.88047 0.0553983 2.36252 0.293982 1.98962 0.673664C1.61671 1.05335 1.41634 1.54613 1.42858 2.05345L1.43614 7.7054C0.882525 8.08079 0.460751 8.5925 0.221491 9.17905C-0.0177691 9.7656 -0.0643375 10.402 0.0873811 11.0119C0.2391 11.6218 0.582651 12.1791 1.07676 12.617C1.57086 13.0549 2.19451 13.3546 2.87275 13.4802C3.10947 13.5213 3.35 13.5419 3.59106 13.5417C4.5443 13.5417 5.4586 13.2003 6.13335 12.5924C6.80809 11.9845 7.18817 11.1599 7.19017 10.2993C7.19154 9.79943 7.06295 9.30625 6.81475 8.85941C6.56655 8.41258 6.20566 8.02456 5.76111 7.72656ZM5.39818 12.2727C5.06987 12.5155 4.68579 12.6893 4.27381 12.7814C3.86183 12.8735 3.4323 12.8816 3.01642 12.8051C2.46447 12.7059 1.9585 12.4587 1.56461 12.0958C1.17073 11.7329 0.907237 11.2712 0.808561 10.771C0.710716 10.3019 0.760115 9.81742 0.951179 9.37233C1.14224 8.92724 1.46736 8.53924 1.8898 8.25217C1.98099 8.19142 2.05516 8.11224 2.10637 8.02097C2.15758 7.9297 2.1844 7.82887 2.18469 7.72656V2.05345C2.17632 1.71995 2.30556 1.39555 2.54729 1.14326C2.78903 0.890966 3.126 0.728792 3.49277 0.688239C3.52771 0.682767 3.56317 0.68048 3.59862 0.681413C3.9704 0.684964 4.32583 0.81987 4.58873 1.05721C4.85163 1.29455 5.00106 1.61543 5.005 1.95106V7.72656C5.00529 7.82887 5.03211 7.9297 5.08332 8.02097C5.13452 8.11224 5.20869 8.19142 5.29988 8.25217C5.64351 8.48433 5.92412 8.78402 6.12049 9.12856C6.31685 9.4731 6.42382 9.85346 6.43329 10.2408C6.44276 10.6282 6.35449 11.0125 6.17515 11.3645C5.99582 11.7165 5.73012 12.0271 5.39818 12.2727Z" fill="white"/>
+                        <path d="M5.02757 10.2993C5.02757 10.6415 4.87701 10.9696 4.60901 11.2116C4.34101 11.4535 3.97752 11.5894 3.59851 11.5894C3.2195 11.5894 2.85602 11.4535 2.58802 11.2116C2.32002 10.9696 2.16946 10.6415 2.16946 10.2993C2.16772 10.0172 2.27008 9.74265 2.46039 9.51893C2.65071 9.2952 2.91813 9.13506 3.22046 9.06379V2.26574C3.22046 2.17522 3.26029 2.08841 3.33119 2.0244C3.40208 1.9604 3.49825 1.92444 3.59851 1.92444C3.69878 1.92444 3.79494 1.9604 3.86584 2.0244C3.93674 2.08841 3.97657 2.17522 3.97657 2.26574V9.06447C4.27812 9.13677 4.54471 9.29709 4.73481 9.52044C4.92491 9.74379 5.02784 10.0176 5.02757 10.2993Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]">{{ Locales["watertemp"] }}</p>
+                    </div>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.9375vw] font-normal leading-[normal]">{{currentVehicleOilLevel}}°</p>
+                    <div></div>
+                  </div>
+                  <div class="flex flex-col justify-evenly items-center w-[5.0521vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex gap-[.2604vw] w-fit h-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".4167vw" height="1.2963vh" viewBox="0 0 8 14" fill="none">
+                        <path d="M5.76111 7.72656V1.95106C5.75649 1.43228 5.52875 0.935416 5.12598 0.56537C4.90578 0.368428 4.64126 0.216523 4.35034 0.119949C4.05942 0.0233752 3.74891 -0.0156102 3.43984 0.00563495C2.88047 0.0553983 2.36252 0.293982 1.98962 0.673664C1.61671 1.05335 1.41634 1.54613 1.42858 2.05345L1.43614 7.7054C0.882525 8.08079 0.460751 8.5925 0.221491 9.17905C-0.0177691 9.7656 -0.0643375 10.402 0.0873811 11.0119C0.2391 11.6218 0.582651 12.1791 1.07676 12.617C1.57086 13.0549 2.19451 13.3546 2.87275 13.4802C3.10947 13.5213 3.35 13.5419 3.59106 13.5417C4.5443 13.5417 5.4586 13.2003 6.13335 12.5924C6.80809 11.9845 7.18817 11.1599 7.19017 10.2993C7.19154 9.79943 7.06295 9.30625 6.81475 8.85941C6.56655 8.41258 6.20566 8.02456 5.76111 7.72656ZM5.39818 12.2727C5.06987 12.5155 4.68579 12.6893 4.27381 12.7814C3.86183 12.8735 3.4323 12.8816 3.01642 12.8051C2.46447 12.7059 1.9585 12.4587 1.56461 12.0958C1.17073 11.7329 0.907237 11.2712 0.808561 10.771C0.710716 10.3019 0.760115 9.81742 0.951179 9.37233C1.14224 8.92724 1.46736 8.53924 1.8898 8.25217C1.98099 8.19142 2.05516 8.11224 2.10637 8.02097C2.15758 7.9297 2.1844 7.82887 2.18469 7.72656V2.05345C2.17632 1.71995 2.30556 1.39555 2.54729 1.14326C2.78903 0.890966 3.126 0.728792 3.49277 0.688239C3.52771 0.682767 3.56317 0.68048 3.59862 0.681413C3.9704 0.684964 4.32583 0.81987 4.58873 1.05721C4.85163 1.29455 5.00106 1.61543 5.005 1.95106V7.72656C5.00529 7.82887 5.03211 7.9297 5.08332 8.02097C5.13452 8.11224 5.20869 8.19142 5.29988 8.25217C5.64351 8.48433 5.92412 8.78402 6.12049 9.12856C6.31685 9.4731 6.42382 9.85346 6.43329 10.2408C6.44276 10.6282 6.35449 11.0125 6.17515 11.3645C5.99582 11.7165 5.73012 12.0271 5.39818 12.2727Z" fill="white"/>
+                        <path d="M5.02757 10.2993C5.02757 10.6415 4.87701 10.9696 4.60901 11.2116C4.34101 11.4535 3.97752 11.5894 3.59851 11.5894C3.2195 11.5894 2.85602 11.4535 2.58802 11.2116C2.32002 10.9696 2.16946 10.6415 2.16946 10.2993C2.16772 10.0172 2.27008 9.74265 2.46039 9.51893C2.65071 9.2952 2.91813 9.13506 3.22046 9.06379V2.26574C3.22046 2.17522 3.26029 2.08841 3.33119 2.0244C3.40208 1.9604 3.49825 1.92444 3.59851 1.92444C3.69878 1.92444 3.79494 1.9604 3.86584 2.0244C3.93674 2.08841 3.97657 2.17522 3.97657 2.26574V9.06447C4.27812 9.13677 4.54471 9.29709 4.73481 9.52044C4.92491 9.74379 5.02784 10.0176 5.02757 10.2993Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]">{{ Locales["enginetemp"] }}</p>
+                    </div>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.9375vw] font-normal leading-[normal]">{{parseFloat(this.currentVehicleEngineTemp.toFixed(0))}}°</p>
+                    <div></div>
+                  </div>
+            
+                </div>
+                <div class="ml-[.3125vw] flex flex-col w-[20.7292vw] h-full flex items-start gap-[1.8519vh]">
+                  <div class="flex justify-center items-center gap-[.6771vw] w-[20.7292vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw] ">
+                   
+                    <p class="w-[18.0729vw] text-[rgba(255,255,255,0.80)] [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px]">{{ Locales["confirmtext"] }}</p>
+                  </div>
+                  <div class="flex justify-between w-[20.7292vw]  h-fit">
+                   
+                    <div class="flex justify-center items-center w-[9.6243vw] h-[4.3519vh] shrink-0 [background:rgba(255,255,255,0.05)] rounded-[.2604vw] text-white text-center [font-family:Gilroy-SemiBold] text-[.7292vw] font-normal leading-[normal]" @click="resetSettings">Reset it</div>
+                    <div class="flex justify-center items-center w-[9.6243vw] h-[4.3519vh] shrink-0 [background:#FFF] rounded-[.2604vw] text-black text-center [font-family:Gilroy-SemiBold] text-[.7292vw] font-normal leading-[normal]" @click="openInput()">Save</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col w-fit h-[87%]  gap-y-[2.3148vh]" v-if="currentPage == 'Home'">
+              <div class="flex flex-col w-full h-[47.5vh] gap-y-[1.8519vh] overflow-x-auto items-center">
+                <div class="flex flex-col w-full h-[7.963vh] gap-[1.5vh]"
+                >
+                  <div class="flex items-end justify-between w-full h-fit">
+                    <div class="flex items-center w-fit h-full gap-x-[.5208vw]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".9896vw" height="1.0185vh" viewBox="0 0 19 11" fill="none">
+                        <path d="M17.1 4.75C16.8716 4.75163 16.6454 4.79443 16.4322 4.87635L14.154 3.0115C14.2101 2.8082 14.25 2.5973 14.25 2.375C14.25 1.0583 13.1917 0 11.875 0C10.5583 0 9.5 1.0583 9.5 2.375C9.5 2.7512 9.595 3.10175 9.7489 3.41715L6.98535 6.68325C6.87477 6.66226 6.76255 6.65113 6.65 6.65C6.47995 6.65 6.3194 6.6785 6.1636 6.7203L3.72875 4.28545C3.7715 4.1306 3.8 3.97005 3.8 3.8C3.8 2.7474 2.9526 1.9 1.9 1.9C0.8474 1.9 0 2.7474 0 3.8C0 4.8526 0.8474 5.7 1.9 5.7C2.07005 5.7 2.2306 5.6715 2.3864 5.6297L4.82125 8.06455C4.77662 8.22261 4.75267 8.38578 4.75 8.55C4.75 9.6026 5.5974 10.45 6.65 10.45C7.7026 10.45 8.55 9.6026 8.55 8.55C8.55 8.32485 8.5044 8.113 8.43315 7.91255L11.2005 4.64265C11.4161 4.70535 11.6394 4.75 11.875 4.75C12.2498 4.7472 12.6187 4.65572 12.9514 4.48305L15.2304 6.3479C15.2122 6.44763 15.2021 6.54865 15.2 6.65C15.2 7.7026 16.0474 8.55 17.1 8.55C18.1526 8.55 19 7.7026 19 6.65C19 5.5974 18.1526 4.75 17.1 4.75Z" fill="white"/>
+                      </svg>
+                      <div class="w-fit h-fit ">
+                        <p class="text-white [font-family:Gilroy-SemiBold] text-[.8333vw] font-normal leading-[normal]">{{ Locales["metrics"] }}</p>
+                        <p class="text-[rgba(255,255,255,0.50)] [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px]">{{ Locales["metricsdescription"] }}</p>
+                      </div>
+                    </div>
+                    
+                  </div>
+                  <div class="flex flex-col items-end w-full h-fit">
+                    <div class="flex items-center justify-between w-[45.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw_.2604vw_0_0] border-b-[0.1852vh] border-[#05080C]">
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-SemiBold] text-[.6333vw] font-normal leading-[normal]">Handling item</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-SemiBold] text-[.6333vw] font-normal leading-[normal]">File metric</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-SemiBold] text-[.6333vw] font-normal leading-[normal]">Ingame metric</div>
+                      <div class="flex w-[25%] h-full justify-center items-center px-[1vw] text-white text-center [font-family:Gilroy-SemiBold] text-[.6333vw] font-normal leading-[normal]">Math</div>
+                    </div>
+                    <div class="flex items-center justify-between w-[45.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[0vw] border-b-[0.1852vh] border-[#05080C]">
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">fInitialDriveForce</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">Acceleration (G-Forces)</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">Acceleration (G-Forces)</div>
+                      <div class="flex w-[25%] h-full justify-center  items-center px-[1vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">
+                        fInitialDriveForce * Ratio of Current Gear</div>
+                    </div>
+                    <div class="flex items-center justify-between w-[45.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[0vw] border-b-[0.1852vh] border-[#05080C]">
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">fDownforceModifier</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">Multiplier</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">Grip gain (G-Forces)</div>
+                      <div class="flex w-[25%] h-full justify-center  items-center px-[1vw] text-white text-center [font-family:Gilroy-Medium] text-[.4333vw] font-normal leading-[normal]">
+                        (0 - 0.035) > (0 - 90% of fInitialDriveMaxFlatVel) * fDownforceModifier * Nº of Wheels</div>
+                    </div>
+                    <div class="flex items-center justify-between w-[45.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[0vw] border-b-[0.1852vh] border-[#05080C]">
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">fInitialDragCoeff</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">Multiplier</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">Air Resistance (G-Forces)</div>
+                      <div class="flex w-[25%] h-full justify-center  items-center px-[1vw] text-white text-center [font-family:Gilroy-Medium] text-[.6333vw] font-normal leading-[normal]">
+                        (Speed * (fInitialDragCoeff * 0.0001))^2</div>
+                    </div>
+                    <div class="flex items-center justify-between w-[45.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[0vw] border-b-[0.1852vh] border-[#05080C]">
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">fDriveInertia</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">Multiplier</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">Seconds</div>
+                      <div class="flex w-[25%] h-full justify-center  items-center px-[1vw] text-white text-center [font-family:Gilroy-Medium] text-[.6333vw] font-normal leading-[normal]">
+                        1 / fDriveInertia</div>
+                    </div>
+                    <div class="flex items-center justify-between w-[45.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[0vw] border-b-[0.1852vh] border-[#05080C]">
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">fInitialDriveMaxFlatVel</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">Speed</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">Kilometers per hour</div>
+                      <div class="flex w-[25%] h-full justify-center  items-center px-[1vw] text-white text-center [font-family:Gilroy-Medium] text-[.6333vw] font-normal leading-[normal]">
+                        fInitialDriveMaxFlatVel / 0.75</div>
+                    </div>
+                    <div class="flex items-center justify-between w-[45.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[0vw] border-b-[0.1852vh] border-[#05080C]">
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">fClutchChangeRateScaleUpShift</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">Multiplier</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">Seconds</div>
+                      <div class="flex w-[25%] h-full justify-center  items-center px-[1vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">
+                        1 / fClutchChangeRateScaleUpShift</div>
+                    </div>
+                    <div class="flex items-center justify-between w-[45.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[0_0_.2604vw_.2604vw]">
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">fBrakeForce</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">Decceleration (G-Forces) per wheel</div>
+                      <div class="flex w-[25%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">Decceleration (G-Forces) per wheel</div>
+                      <div class="flex w-[25%] h-full justify-center  items-center px-[1vw] text-white text-center [font-family:Gilroy-Medium] text-[.6333vw] font-normal leading-[normal]">Speed / (fBrakeForce * Number of wheels)</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-center w-[45.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw_.2604vw_0_0] border-b-[0.1852vh] border-[#05080C]">
+                    <p class="text-white text-center [font-family:Gilroy-SemiBold] text-[.6333vw] font-normal leading-[normal]">Speed is measured in m/s.</p>
+                  </div>
+                </div>
+               
+              </div>
+              <div class="flex w-full h-[20%] gap-[.8854vw] ">
+                <div class="w-[12.0313vw] h-[13.4259vh]">
+                  <div class="w-[12.0313vw] h-[11.5741vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex items-center px-[0.9vw] gap-[.3125vw] w-full h-[25%]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".625vw" height="1.1111vh" viewBox="0 0 12 12" fill="none">
+                        <path d="M12 12H0V10.6667H12V12ZM3.33333 4.66667H0.666667V9.33333H3.33333V4.66667ZM7.33333 0H4.66667V9.33333H7.33333V0ZM11.3333 2H8.66667V9.33333H11.3333V2Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]"> {{ Locales["vehiclestats"] }}</p>
+                    </div>
+                    <div class="flex justify-evenly w-full h-[75%] ">
+                      <div class="flex items-end w-[1.9503vw] h-[8.6294vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_5px_0px_0px]">
+                        <div class="w-full h-[70%] [background:linear-gradient(0deg,#1C202E_0%,#FFF_100%)] rounded-[5px_5px_0px_0px]" :style="{ height: currentVehicleAcceleration + '%'}"></div>
+                      </div>
+                      <div class="flex items-end w-[1.9503vw] h-[8.6294vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_5px_0px_0px]">
+                        <div class="w-full h-[70%] [background:linear-gradient(0deg,#1C202E_0%,#FFF_100%)] rounded-[5px_5px_0px_0px]" :style="{ height: currentVehicleTopSpeed + '%'}"></div>
+                      </div>
+                      <div class="flex items-end w-[1.9503vw] h-[8.6294vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_5px_0px_0px]">
+                        <div class="w-full h-[70%] [background:linear-gradient(0deg,#1C202E_0%,#FFF_100%)] rounded-[5px_5px_0px_0px]" :style="{ height: currentVehicleTraction + '%'}"></div>
+                      </div>
+                      <div class="flex items-end w-[1.9503vw] h-[8.6294vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[5px_5px_0px_0px]">
+                        <div class="w-full h-[70%] [background:linear-gradient(0deg,#1C202E_0%,#FFF_100%)] rounded-[5px_5px_0px_0px]" :style="{ height: currentVehicleBraking + '%'}"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center w-full h-fit gap-[.7813vw] px-[.2604vw]">
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.5208vw] font-normal leading-[normal]">{{ Locales["acceleration"] }}</p>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.5208vw] font-normal leading-[normal]">{{ Locales["speed"] }}</p>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.5208vw] font-normal leading-[normal]">{{ Locales["handling"] }}</p>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.5208vw] font-normal leading-[normal]">{{ Locales["braking"] }}</p>
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-x-[.525vw] gap-y-[1vh] w-[10.7813vw] h-[13.1481vh] ">
+                  <div class="flex flex-col justify-evenly items-center w-[5.0521vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex gap-[.2604vw] w-fit h-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".4167vw" height="1.2963vh" viewBox="0 0 8 14" fill="none">
+                        <path d="M5.76111 7.72656V1.95106C5.75649 1.43228 5.52875 0.935416 5.12598 0.56537C4.90578 0.368428 4.64126 0.216523 4.35034 0.119949C4.05942 0.0233752 3.74891 -0.0156102 3.43984 0.00563495C2.88047 0.0553983 2.36252 0.293982 1.98962 0.673664C1.61671 1.05335 1.41634 1.54613 1.42858 2.05345L1.43614 7.7054C0.882525 8.08079 0.460751 8.5925 0.221491 9.17905C-0.0177691 9.7656 -0.0643375 10.402 0.0873811 11.0119C0.2391 11.6218 0.582651 12.1791 1.07676 12.617C1.57086 13.0549 2.19451 13.3546 2.87275 13.4802C3.10947 13.5213 3.35 13.5419 3.59106 13.5417C4.5443 13.5417 5.4586 13.2003 6.13335 12.5924C6.80809 11.9845 7.18817 11.1599 7.19017 10.2993C7.19154 9.79943 7.06295 9.30625 6.81475 8.85941C6.56655 8.41258 6.20566 8.02456 5.76111 7.72656ZM5.39818 12.2727C5.06987 12.5155 4.68579 12.6893 4.27381 12.7814C3.86183 12.8735 3.4323 12.8816 3.01642 12.8051C2.46447 12.7059 1.9585 12.4587 1.56461 12.0958C1.17073 11.7329 0.907237 11.2712 0.808561 10.771C0.710716 10.3019 0.760115 9.81742 0.951179 9.37233C1.14224 8.92724 1.46736 8.53924 1.8898 8.25217C1.98099 8.19142 2.05516 8.11224 2.10637 8.02097C2.15758 7.9297 2.1844 7.82887 2.18469 7.72656V2.05345C2.17632 1.71995 2.30556 1.39555 2.54729 1.14326C2.78903 0.890966 3.126 0.728792 3.49277 0.688239C3.52771 0.682767 3.56317 0.68048 3.59862 0.681413C3.9704 0.684964 4.32583 0.81987 4.58873 1.05721C4.85163 1.29455 5.00106 1.61543 5.005 1.95106V7.72656C5.00529 7.82887 5.03211 7.9297 5.08332 8.02097C5.13452 8.11224 5.20869 8.19142 5.29988 8.25217C5.64351 8.48433 5.92412 8.78402 6.12049 9.12856C6.31685 9.4731 6.42382 9.85346 6.43329 10.2408C6.44276 10.6282 6.35449 11.0125 6.17515 11.3645C5.99582 11.7165 5.73012 12.0271 5.39818 12.2727Z" fill="white"/>
+                        <path d="M5.02757 10.2993C5.02757 10.6415 4.87701 10.9696 4.60901 11.2116C4.34101 11.4535 3.97752 11.5894 3.59851 11.5894C3.2195 11.5894 2.85602 11.4535 2.58802 11.2116C2.32002 10.9696 2.16946 10.6415 2.16946 10.2993C2.16772 10.0172 2.27008 9.74265 2.46039 9.51893C2.65071 9.2952 2.91813 9.13506 3.22046 9.06379V2.26574C3.22046 2.17522 3.26029 2.08841 3.33119 2.0244C3.40208 1.9604 3.49825 1.92444 3.59851 1.92444C3.69878 1.92444 3.79494 1.9604 3.86584 2.0244C3.93674 2.08841 3.97657 2.17522 3.97657 2.26574V9.06447C4.27812 9.13677 4.54471 9.29709 4.73481 9.52044C4.92491 9.74379 5.02784 10.0176 5.02757 10.2993Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]">{{ Locales["oiltemp"] }}</p>
+                    </div>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.9375vw] font-normal leading-[normal]">{{currentVehicleFuelLevel}}L</p>
+                    <div></div>
+                  </div>
+                  <div class="flex flex-col justify-evenly items-center w-[5.0521vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex gap-[.2604vw] w-fit h-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".4167vw" height="1.2963vh" viewBox="0 0 8 14" fill="none">
+                        <path d="M5.76111 7.72656V1.95106C5.75649 1.43228 5.52875 0.935416 5.12598 0.56537C4.90578 0.368428 4.64126 0.216523 4.35034 0.119949C4.05942 0.0233752 3.74891 -0.0156102 3.43984 0.00563495C2.88047 0.0553983 2.36252 0.293982 1.98962 0.673664C1.61671 1.05335 1.41634 1.54613 1.42858 2.05345L1.43614 7.7054C0.882525 8.08079 0.460751 8.5925 0.221491 9.17905C-0.0177691 9.7656 -0.0643375 10.402 0.0873811 11.0119C0.2391 11.6218 0.582651 12.1791 1.07676 12.617C1.57086 13.0549 2.19451 13.3546 2.87275 13.4802C3.10947 13.5213 3.35 13.5419 3.59106 13.5417C4.5443 13.5417 5.4586 13.2003 6.13335 12.5924C6.80809 11.9845 7.18817 11.1599 7.19017 10.2993C7.19154 9.79943 7.06295 9.30625 6.81475 8.85941C6.56655 8.41258 6.20566 8.02456 5.76111 7.72656ZM5.39818 12.2727C5.06987 12.5155 4.68579 12.6893 4.27381 12.7814C3.86183 12.8735 3.4323 12.8816 3.01642 12.8051C2.46447 12.7059 1.9585 12.4587 1.56461 12.0958C1.17073 11.7329 0.907237 11.2712 0.808561 10.771C0.710716 10.3019 0.760115 9.81742 0.951179 9.37233C1.14224 8.92724 1.46736 8.53924 1.8898 8.25217C1.98099 8.19142 2.05516 8.11224 2.10637 8.02097C2.15758 7.9297 2.1844 7.82887 2.18469 7.72656V2.05345C2.17632 1.71995 2.30556 1.39555 2.54729 1.14326C2.78903 0.890966 3.126 0.728792 3.49277 0.688239C3.52771 0.682767 3.56317 0.68048 3.59862 0.681413C3.9704 0.684964 4.32583 0.81987 4.58873 1.05721C4.85163 1.29455 5.00106 1.61543 5.005 1.95106V7.72656C5.00529 7.82887 5.03211 7.9297 5.08332 8.02097C5.13452 8.11224 5.20869 8.19142 5.29988 8.25217C5.64351 8.48433 5.92412 8.78402 6.12049 9.12856C6.31685 9.4731 6.42382 9.85346 6.43329 10.2408C6.44276 10.6282 6.35449 11.0125 6.17515 11.3645C5.99582 11.7165 5.73012 12.0271 5.39818 12.2727Z" fill="white"/>
+                        <path d="M5.02757 10.2993C5.02757 10.6415 4.87701 10.9696 4.60901 11.2116C4.34101 11.4535 3.97752 11.5894 3.59851 11.5894C3.2195 11.5894 2.85602 11.4535 2.58802 11.2116C2.32002 10.9696 2.16946 10.6415 2.16946 10.2993C2.16772 10.0172 2.27008 9.74265 2.46039 9.51893C2.65071 9.2952 2.91813 9.13506 3.22046 9.06379V2.26574C3.22046 2.17522 3.26029 2.08841 3.33119 2.0244C3.40208 1.9604 3.49825 1.92444 3.59851 1.92444C3.69878 1.92444 3.79494 1.9604 3.86584 2.0244C3.93674 2.08841 3.97657 2.17522 3.97657 2.26574V9.06447C4.27812 9.13677 4.54471 9.29709 4.73481 9.52044C4.92491 9.74379 5.02784 10.0176 5.02757 10.2993Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]">{{ Locales["dashtemp"] }}</p>
+                    </div>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.9375vw] font-normal leading-[normal]">{{currentVehicleHealth}}</p>
+                    <div></div>
+                  </div>
+                  <div class="flex flex-col justify-evenly items-center w-[5.0521vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex gap-[.2604vw] w-fit h-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".4167vw" height="1.2963vh" viewBox="0 0 8 14" fill="none">
+                        <path d="M5.76111 7.72656V1.95106C5.75649 1.43228 5.52875 0.935416 5.12598 0.56537C4.90578 0.368428 4.64126 0.216523 4.35034 0.119949C4.05942 0.0233752 3.74891 -0.0156102 3.43984 0.00563495C2.88047 0.0553983 2.36252 0.293982 1.98962 0.673664C1.61671 1.05335 1.41634 1.54613 1.42858 2.05345L1.43614 7.7054C0.882525 8.08079 0.460751 8.5925 0.221491 9.17905C-0.0177691 9.7656 -0.0643375 10.402 0.0873811 11.0119C0.2391 11.6218 0.582651 12.1791 1.07676 12.617C1.57086 13.0549 2.19451 13.3546 2.87275 13.4802C3.10947 13.5213 3.35 13.5419 3.59106 13.5417C4.5443 13.5417 5.4586 13.2003 6.13335 12.5924C6.80809 11.9845 7.18817 11.1599 7.19017 10.2993C7.19154 9.79943 7.06295 9.30625 6.81475 8.85941C6.56655 8.41258 6.20566 8.02456 5.76111 7.72656ZM5.39818 12.2727C5.06987 12.5155 4.68579 12.6893 4.27381 12.7814C3.86183 12.8735 3.4323 12.8816 3.01642 12.8051C2.46447 12.7059 1.9585 12.4587 1.56461 12.0958C1.17073 11.7329 0.907237 11.2712 0.808561 10.771C0.710716 10.3019 0.760115 9.81742 0.951179 9.37233C1.14224 8.92724 1.46736 8.53924 1.8898 8.25217C1.98099 8.19142 2.05516 8.11224 2.10637 8.02097C2.15758 7.9297 2.1844 7.82887 2.18469 7.72656V2.05345C2.17632 1.71995 2.30556 1.39555 2.54729 1.14326C2.78903 0.890966 3.126 0.728792 3.49277 0.688239C3.52771 0.682767 3.56317 0.68048 3.59862 0.681413C3.9704 0.684964 4.32583 0.81987 4.58873 1.05721C4.85163 1.29455 5.00106 1.61543 5.005 1.95106V7.72656C5.00529 7.82887 5.03211 7.9297 5.08332 8.02097C5.13452 8.11224 5.20869 8.19142 5.29988 8.25217C5.64351 8.48433 5.92412 8.78402 6.12049 9.12856C6.31685 9.4731 6.42382 9.85346 6.43329 10.2408C6.44276 10.6282 6.35449 11.0125 6.17515 11.3645C5.99582 11.7165 5.73012 12.0271 5.39818 12.2727Z" fill="white"/>
+                        <path d="M5.02757 10.2993C5.02757 10.6415 4.87701 10.9696 4.60901 11.2116C4.34101 11.4535 3.97752 11.5894 3.59851 11.5894C3.2195 11.5894 2.85602 11.4535 2.58802 11.2116C2.32002 10.9696 2.16946 10.6415 2.16946 10.2993C2.16772 10.0172 2.27008 9.74265 2.46039 9.51893C2.65071 9.2952 2.91813 9.13506 3.22046 9.06379V2.26574C3.22046 2.17522 3.26029 2.08841 3.33119 2.0244C3.40208 1.9604 3.49825 1.92444 3.59851 1.92444C3.69878 1.92444 3.79494 1.9604 3.86584 2.0244C3.93674 2.08841 3.97657 2.17522 3.97657 2.26574V9.06447C4.27812 9.13677 4.54471 9.29709 4.73481 9.52044C4.92491 9.74379 5.02784 10.0176 5.02757 10.2993Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]">{{ Locales["watertemp"] }}</p>
+                    </div>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.9375vw] font-normal leading-[normal]">{{currentVehicleOilLevel}}°</p>
+                    <div></div>
+                  </div>
+                  <div class="flex flex-col justify-evenly items-center w-[5.0521vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw]">
+                    <div class="flex gap-[.2604vw] w-fit h-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width=".4167vw" height="1.2963vh" viewBox="0 0 8 14" fill="none">
+                        <path d="M5.76111 7.72656V1.95106C5.75649 1.43228 5.52875 0.935416 5.12598 0.56537C4.90578 0.368428 4.64126 0.216523 4.35034 0.119949C4.05942 0.0233752 3.74891 -0.0156102 3.43984 0.00563495C2.88047 0.0553983 2.36252 0.293982 1.98962 0.673664C1.61671 1.05335 1.41634 1.54613 1.42858 2.05345L1.43614 7.7054C0.882525 8.08079 0.460751 8.5925 0.221491 9.17905C-0.0177691 9.7656 -0.0643375 10.402 0.0873811 11.0119C0.2391 11.6218 0.582651 12.1791 1.07676 12.617C1.57086 13.0549 2.19451 13.3546 2.87275 13.4802C3.10947 13.5213 3.35 13.5419 3.59106 13.5417C4.5443 13.5417 5.4586 13.2003 6.13335 12.5924C6.80809 11.9845 7.18817 11.1599 7.19017 10.2993C7.19154 9.79943 7.06295 9.30625 6.81475 8.85941C6.56655 8.41258 6.20566 8.02456 5.76111 7.72656ZM5.39818 12.2727C5.06987 12.5155 4.68579 12.6893 4.27381 12.7814C3.86183 12.8735 3.4323 12.8816 3.01642 12.8051C2.46447 12.7059 1.9585 12.4587 1.56461 12.0958C1.17073 11.7329 0.907237 11.2712 0.808561 10.771C0.710716 10.3019 0.760115 9.81742 0.951179 9.37233C1.14224 8.92724 1.46736 8.53924 1.8898 8.25217C1.98099 8.19142 2.05516 8.11224 2.10637 8.02097C2.15758 7.9297 2.1844 7.82887 2.18469 7.72656V2.05345C2.17632 1.71995 2.30556 1.39555 2.54729 1.14326C2.78903 0.890966 3.126 0.728792 3.49277 0.688239C3.52771 0.682767 3.56317 0.68048 3.59862 0.681413C3.9704 0.684964 4.32583 0.81987 4.58873 1.05721C4.85163 1.29455 5.00106 1.61543 5.005 1.95106V7.72656C5.00529 7.82887 5.03211 7.9297 5.08332 8.02097C5.13452 8.11224 5.20869 8.19142 5.29988 8.25217C5.64351 8.48433 5.92412 8.78402 6.12049 9.12856C6.31685 9.4731 6.42382 9.85346 6.43329 10.2408C6.44276 10.6282 6.35449 11.0125 6.17515 11.3645C5.99582 11.7165 5.73012 12.0271 5.39818 12.2727Z" fill="white"/>
+                        <path d="M5.02757 10.2993C5.02757 10.6415 4.87701 10.9696 4.60901 11.2116C4.34101 11.4535 3.97752 11.5894 3.59851 11.5894C3.2195 11.5894 2.85602 11.4535 2.58802 11.2116C2.32002 10.9696 2.16946 10.6415 2.16946 10.2993C2.16772 10.0172 2.27008 9.74265 2.46039 9.51893C2.65071 9.2952 2.91813 9.13506 3.22046 9.06379V2.26574C3.22046 2.17522 3.26029 2.08841 3.33119 2.0244C3.40208 1.9604 3.49825 1.92444 3.59851 1.92444C3.69878 1.92444 3.79494 1.9604 3.86584 2.0244C3.93674 2.08841 3.97657 2.17522 3.97657 2.26574V9.06447C4.27812 9.13677 4.54471 9.29709 4.73481 9.52044C4.92491 9.74379 5.02784 10.0176 5.02757 10.2993Z" fill="white"/>
+                      </svg>
+                      <p class="text-white [font-family:Gilroy-SemiBold] text-[.5208vw] font-normal leading-[normal]">{{ Locales["enginetemp"] }}</p>
+                    </div>
+                    <p class="text-white [font-family:Gilroy-Medium] text-[.9375vw] font-normal leading-[normal]">{{parseFloat(this.currentVehicleEngineTemp.toFixed(0))}}°</p>
+                    <div></div>
+                  </div>
+            
+                </div>
+                <div class="ml-[.3125vw] flex flex-col w-[20.7292vw] h-full flex items-start gap-[1.8519vh]">
+                  <div class="flex justify-center items-center gap-[.6771vw] w-[20.7292vw] h-[6.0185vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw] ">
+                    
+                    <p class="w-[18.0729vw] text-[rgba(255,255,255,0.80)] [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px]">{{ Locales["confirmtext"] }}</p>
+                  </div>
+                  <div class="flex justify-between w-[20.7292vw]  h-fit">
+                    <div class="flex justify-center items-center w-[9.6243vw] h-[4.3519vh] shrink-0 [background:rgba(255,255,255,0.05)] rounded-[.2604vw] text-white text-center [font-family:Gilroy-SemiBold] text-[.7292vw] font-normal leading-[normal]" @click="resetSettings">Reset it</div>
+                    <div class="flex justify-center items-center w-[9.6243vw] h-[4.3519vh] shrink-0 [background:#FFF] rounded-[.2604vw] text-black text-center [font-family:Gilroy-SemiBold] text-[.7292vw] font-normal leading-[normal]" @click="applySettingsSimple">
+                      Apply
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col w-fit h-[87%] gap-y-[2.3148vh]" v-if="currentPage == 'Presets'">
+              <div class="flex flex-col w-full h-full  gap-y-[1.8519vh] py-[1vh] overflow-x-auto items-center">
+                <div class="flex flex-col w-full h-fit gap-[1.5vh]">
+                  <div class="flex items-end justify-between w-full h-fit">
+                    <div class="flex items-center w-fit h-full gap-x-[.5208vw]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="1.3021vw" height="0.7407vh" viewBox="0 0 25 8" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M9.31433 3.5386C9.31433 3.40248 9.42205 3.29208 9.55544 3.29208H12.667L12.7035 1.10771L16.0926 4.12309L12.667 7.13846L12.7035 4.85909H9.55532C9.42218 4.85909 9.31433 4.74893 9.31433 4.61256V3.5386ZM7.86753 8H6.44106V6.03631H1.42634V8H0V4.00001C0 3.41622 0.0987693 2.87878 0.296308 2.38771C0.493846 1.8968 0.768205 1.47465 1.11939 1.12125C1.4704 0.768022 1.88553 0.492822 2.36477 0.295654C2.84385 0.098567 3.36683 2.3677e-05 3.9337 2.3677e-05H7.14891C7.24491 -0.000543835 7.34006 0.0184126 7.42876 0.0557777C7.51493 0.0919073 7.59323 0.145011 7.65915 0.212033C7.72506 0.279055 7.77729 0.358672 7.81282 0.446299C7.84956 0.536486 7.86821 0.633234 7.86765 0.730853V8H7.86753ZM1.42647 4.58586H6.44118V1.45048H3.93358C3.88977 1.45048 3.79741 1.457 3.65652 1.47005C3.51563 1.4831 3.35287 1.51563 3.16824 1.56765C2.98353 1.61967 2.78878 1.69967 2.58398 1.80765C2.37902 1.91546 2.19064 2.06418 2.01884 2.2538C1.84696 2.44359 1.70522 2.68071 1.59362 2.96518C1.4821 3.24966 1.42634 3.5946 1.42634 4.00001L1.42647 4.58586ZM25 6.14659C25 6.32242 24.9703 6.51102 24.9108 6.71237C24.8514 6.91381 24.7542 7.1006 24.6191 7.27274C24.4841 7.4448 24.3085 7.58851 24.0924 7.70388C23.8763 7.81924 23.6117 7.87692 23.2984 7.87692H17.9663C17.8701 7.87773 17.7746 7.85907 17.6855 7.82203C17.6017 7.78711 17.5255 7.73575 17.4612 7.67089C17.3975 7.60555 17.347 7.5281 17.3127 7.44296C17.2762 7.35236 17.2578 7.2553 17.2586 7.15742V0.719652C17.2581 0.529048 17.3308 0.345773 17.4612 0.208884C17.5248 0.142547 17.6011 0.0901847 17.6854 0.0550387C17.7745 0.0179406 17.87 -0.000760482 17.9663 2.3677e-05H22.6661C22.839 2.3677e-05 23.0245 0.0311624 23.2225 0.0934391C23.4207 0.155716 23.6053 0.25549 23.7763 0.392761C23.9473 0.530033 24.0895 0.708575 24.2031 0.92839C24.3165 1.14812 24.3733 1.41725 24.3733 1.73577V2.00494C24.3733 2.25766 24.3318 2.52958 24.2489 2.82069C24.1661 3.11181 24.0328 3.38738 23.8491 3.6474C24.0077 3.74627 24.1563 3.86524 24.2948 4.00432C24.437 4.14823 24.5597 4.31081 24.6595 4.48776C24.7639 4.6709 24.8468 4.87779 24.908 5.10844C24.9693 5.33925 24.9999 5.59377 24.9999 5.87201L25 6.14659ZM23.5954 5.87201C23.5954 5.68518 23.5666 5.51763 23.509 5.36936C23.4514 5.22101 23.3703 5.09375 23.2658 4.98758C23.1614 4.8814 23.0353 4.79993 22.8877 4.74315C22.74 4.68653 22.5744 4.65818 22.3907 4.6581H19.2251V3.21885H21.7588C21.9424 3.21885 22.1081 3.1905 22.2556 3.1338C22.4033 3.07694 22.5294 2.99546 22.6339 2.88937C22.7382 2.78319 22.8184 2.65593 22.8743 2.50759C22.93 2.35932 22.9578 2.19177 22.9579 2.00494V1.73577C22.9579 1.53064 22.8607 1.42808 22.6662 1.42808H18.6634V6.44874H23.2983C23.3235 6.44874 23.3541 6.4469 23.3902 6.4432C23.4261 6.43951 23.4585 6.42856 23.4874 6.41034C23.5162 6.39196 23.5415 6.36083 23.563 6.31693C23.5846 6.27303 23.5954 6.2126 23.5954 6.13564V5.87201Z" fill="white"/>
+                      </svg>
+                      <div class="w-fit h-fit ">
+                        <p class="text-white [font-family:Gilroy-SemiBold] text-[.8333vw] font-normal leading-[normal]">{{ Locales["ucreatedpresets"] }}</p>
+                        <p class="text-[rgba(255,255,255,0.50)] [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px]">{{ Locales["ucreatedpresetsdesc"] }}</p>
+                      </div>
+                    </div>
+                    
+                  </div>
+                  <div class="flex flex-col items-end w-full h-fit gap-[0.5vh]">
+                    <div class="flex items-center justify-between w-[45.7292vw] h-fit  shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw_.2604vw_.2604vw_.2604vw]  overflow-hidden"
+                    v-for="(preset, index) in readyPresets">
+                      <div class="flex flex-col items-start justify-center w-fit h-full py-[1vh] px-[1vw]">
+                        <p class="text-white text-center [font-family:Gilroy-SemiBold] text-[.7333vw] font-normal leading-[normal]">{{preset.title}}</p>
+                        <p class="text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">{{preset.description}}</p>
+                      </div>
+                      <div class="flex w-fit h-full">
+                        <div class="flex justify-center items-center w-[10vw] h-full [background:rgba(255,255,255,0.02)] px-[.5208vw] text-[#fff] text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal] cursor-pointer"  @click="selectReadyPreset(preset.title)">
+                          Active
+                        </div>
+                      
+                      </div>
+                     
+                      
+                    </div>
+                  </div>
+                </div>
+                <div class="flex flex-col w-full h-fit gap-[1.5vh]">
+                  <div class="flex items-end justify-between w-full h-fit">
+                    <div class="flex items-center w-fit h-full gap-x-[.5208vw]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="1.3021vw" height="0.7407vh" viewBox="0 0 25 8" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M9.31433 3.5386C9.31433 3.40248 9.42205 3.29208 9.55544 3.29208H12.667L12.7035 1.10771L16.0926 4.12309L12.667 7.13846L12.7035 4.85909H9.55532C9.42218 4.85909 9.31433 4.74893 9.31433 4.61256V3.5386ZM7.86753 8H6.44106V6.03631H1.42634V8H0V4.00001C0 3.41622 0.0987693 2.87878 0.296308 2.38771C0.493846 1.8968 0.768205 1.47465 1.11939 1.12125C1.4704 0.768022 1.88553 0.492822 2.36477 0.295654C2.84385 0.098567 3.36683 2.3677e-05 3.9337 2.3677e-05H7.14891C7.24491 -0.000543835 7.34006 0.0184126 7.42876 0.0557777C7.51493 0.0919073 7.59323 0.145011 7.65915 0.212033C7.72506 0.279055 7.77729 0.358672 7.81282 0.446299C7.84956 0.536486 7.86821 0.633234 7.86765 0.730853V8H7.86753ZM1.42647 4.58586H6.44118V1.45048H3.93358C3.88977 1.45048 3.79741 1.457 3.65652 1.47005C3.51563 1.4831 3.35287 1.51563 3.16824 1.56765C2.98353 1.61967 2.78878 1.69967 2.58398 1.80765C2.37902 1.91546 2.19064 2.06418 2.01884 2.2538C1.84696 2.44359 1.70522 2.68071 1.59362 2.96518C1.4821 3.24966 1.42634 3.5946 1.42634 4.00001L1.42647 4.58586ZM25 6.14659C25 6.32242 24.9703 6.51102 24.9108 6.71237C24.8514 6.91381 24.7542 7.1006 24.6191 7.27274C24.4841 7.4448 24.3085 7.58851 24.0924 7.70388C23.8763 7.81924 23.6117 7.87692 23.2984 7.87692H17.9663C17.8701 7.87773 17.7746 7.85907 17.6855 7.82203C17.6017 7.78711 17.5255 7.73575 17.4612 7.67089C17.3975 7.60555 17.347 7.5281 17.3127 7.44296C17.2762 7.35236 17.2578 7.2553 17.2586 7.15742V0.719652C17.2581 0.529048 17.3308 0.345773 17.4612 0.208884C17.5248 0.142547 17.6011 0.0901847 17.6854 0.0550387C17.7745 0.0179406 17.87 -0.000760482 17.9663 2.3677e-05H22.6661C22.839 2.3677e-05 23.0245 0.0311624 23.2225 0.0934391C23.4207 0.155716 23.6053 0.25549 23.7763 0.392761C23.9473 0.530033 24.0895 0.708575 24.2031 0.92839C24.3165 1.14812 24.3733 1.41725 24.3733 1.73577V2.00494C24.3733 2.25766 24.3318 2.52958 24.2489 2.82069C24.1661 3.11181 24.0328 3.38738 23.8491 3.6474C24.0077 3.74627 24.1563 3.86524 24.2948 4.00432C24.437 4.14823 24.5597 4.31081 24.6595 4.48776C24.7639 4.6709 24.8468 4.87779 24.908 5.10844C24.9693 5.33925 24.9999 5.59377 24.9999 5.87201L25 6.14659ZM23.5954 5.87201C23.5954 5.68518 23.5666 5.51763 23.509 5.36936C23.4514 5.22101 23.3703 5.09375 23.2658 4.98758C23.1614 4.8814 23.0353 4.79993 22.8877 4.74315C22.74 4.68653 22.5744 4.65818 22.3907 4.6581H19.2251V3.21885H21.7588C21.9424 3.21885 22.1081 3.1905 22.2556 3.1338C22.4033 3.07694 22.5294 2.99546 22.6339 2.88937C22.7382 2.78319 22.8184 2.65593 22.8743 2.50759C22.93 2.35932 22.9578 2.19177 22.9579 2.00494V1.73577C22.9579 1.53064 22.8607 1.42808 22.6662 1.42808H18.6634V6.44874H23.2983C23.3235 6.44874 23.3541 6.4469 23.3902 6.4432C23.4261 6.43951 23.4585 6.42856 23.4874 6.41034C23.5162 6.39196 23.5415 6.36083 23.563 6.31693C23.5846 6.27303 23.5954 6.2126 23.5954 6.13564V5.87201Z" fill="white"/>
+                      </svg>
+                      <div class="w-fit h-fit ">
+                        <p class="text-white [font-family:Gilroy-SemiBold] text-[.8333vw] font-normal leading-[normal]">{{ Locales["ucreatedpresets"] }}</p>
+                        <p class="text-[rgba(255,255,255,0.50)] [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px]">{{ Locales["ucreatedpresetsdesc"] }}</p>
+                      </div>
+                    </div>
+                    
+                  </div>
+                  <div class="flex flex-col items-end w-full h-fit gap-[0.5vh]">
+                    <div class="flex items-center justify-between w-[45.7292vw] h-fit  shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw_.2604vw_.2604vw_.2604vw]  overflow-hidden"
+                    v-for="(preset, index) in Presets">
+                      <div class="flex flex-col items-start justify-center w-fit h-full py-[1vh] px-[1vw]">
+                        <p class="text-white text-center [font-family:Gilroy-SemiBold] text-[.7333vw] font-normal leading-[normal]">{{preset.title}}</p>
+                        <p class="text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">{{preset.description}}</p>
+                      </div>
+                      <div class="flex w-fit h-full">
+                        <div class="flex justify-center items-center w-[5vw] h-full [background:rgba(255,255,255,0.02)] px-[.5208vw] text-[#fff] text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal] cursor-pointer" @click="InsertXML(preset.title)" >
+                          Active
+                        </div>
+                        <div class="flex justify-center items-center w-[5vw] h-full [background:#FF000005] px-[.5208vw] text-[#FF0000] text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal] cursor-pointer" @click="deletePreset(preset.title, index)">
+                          Delete
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex flex-col w-fit h-[87%] gap-y-[2.3148vh]" v-if="currentPage == 'XML'">
+              <div class="flex flex-col w-full h-full  gap-y-[1.8519vh] py-[1vh] overflow-x-auto items-center">
+                <div class="flex flex-col w-full h-fit gap-[1.5vh]">
+                  <div class="flex items-end justify-between w-full h-fit">
+                    <div class="flex items-center w-fit h-full gap-x-[.5208vw]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="1.3021vw" height="0.7407vh" viewBox="0 0 25 8" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M9.31433 3.5386C9.31433 3.40248 9.42205 3.29208 9.55544 3.29208H12.667L12.7035 1.10771L16.0926 4.12309L12.667 7.13846L12.7035 4.85909H9.55532C9.42218 4.85909 9.31433 4.74893 9.31433 4.61256V3.5386ZM7.86753 8H6.44106V6.03631H1.42634V8H0V4.00001C0 3.41622 0.0987693 2.87878 0.296308 2.38771C0.493846 1.8968 0.768205 1.47465 1.11939 1.12125C1.4704 0.768022 1.88553 0.492822 2.36477 0.295654C2.84385 0.098567 3.36683 2.3677e-05 3.9337 2.3677e-05H7.14891C7.24491 -0.000543835 7.34006 0.0184126 7.42876 0.0557777C7.51493 0.0919073 7.59323 0.145011 7.65915 0.212033C7.72506 0.279055 7.77729 0.358672 7.81282 0.446299C7.84956 0.536486 7.86821 0.633234 7.86765 0.730853V8H7.86753ZM1.42647 4.58586H6.44118V1.45048H3.93358C3.88977 1.45048 3.79741 1.457 3.65652 1.47005C3.51563 1.4831 3.35287 1.51563 3.16824 1.56765C2.98353 1.61967 2.78878 1.69967 2.58398 1.80765C2.37902 1.91546 2.19064 2.06418 2.01884 2.2538C1.84696 2.44359 1.70522 2.68071 1.59362 2.96518C1.4821 3.24966 1.42634 3.5946 1.42634 4.00001L1.42647 4.58586ZM25 6.14659C25 6.32242 24.9703 6.51102 24.9108 6.71237C24.8514 6.91381 24.7542 7.1006 24.6191 7.27274C24.4841 7.4448 24.3085 7.58851 24.0924 7.70388C23.8763 7.81924 23.6117 7.87692 23.2984 7.87692H17.9663C17.8701 7.87773 17.7746 7.85907 17.6855 7.82203C17.6017 7.78711 17.5255 7.73575 17.4612 7.67089C17.3975 7.60555 17.347 7.5281 17.3127 7.44296C17.2762 7.35236 17.2578 7.2553 17.2586 7.15742V0.719652C17.2581 0.529048 17.3308 0.345773 17.4612 0.208884C17.5248 0.142547 17.6011 0.0901847 17.6854 0.0550387C17.7745 0.0179406 17.87 -0.000760482 17.9663 2.3677e-05H22.6661C22.839 2.3677e-05 23.0245 0.0311624 23.2225 0.0934391C23.4207 0.155716 23.6053 0.25549 23.7763 0.392761C23.9473 0.530033 24.0895 0.708575 24.2031 0.92839C24.3165 1.14812 24.3733 1.41725 24.3733 1.73577V2.00494C24.3733 2.25766 24.3318 2.52958 24.2489 2.82069C24.1661 3.11181 24.0328 3.38738 23.8491 3.6474C24.0077 3.74627 24.1563 3.86524 24.2948 4.00432C24.437 4.14823 24.5597 4.31081 24.6595 4.48776C24.7639 4.6709 24.8468 4.87779 24.908 5.10844C24.9693 5.33925 24.9999 5.59377 24.9999 5.87201L25 6.14659ZM23.5954 5.87201C23.5954 5.68518 23.5666 5.51763 23.509 5.36936C23.4514 5.22101 23.3703 5.09375 23.2658 4.98758C23.1614 4.8814 23.0353 4.79993 22.8877 4.74315C22.74 4.68653 22.5744 4.65818 22.3907 4.6581H19.2251V3.21885H21.7588C21.9424 3.21885 22.1081 3.1905 22.2556 3.1338C22.4033 3.07694 22.5294 2.99546 22.6339 2.88937C22.7382 2.78319 22.8184 2.65593 22.8743 2.50759C22.93 2.35932 22.9578 2.19177 22.9579 2.00494V1.73577C22.9579 1.53064 22.8607 1.42808 22.6662 1.42808H18.6634V6.44874H23.2983C23.3235 6.44874 23.3541 6.4469 23.3902 6.4432C23.4261 6.43951 23.4585 6.42856 23.4874 6.41034C23.5162 6.39196 23.5415 6.36083 23.563 6.31693C23.5846 6.27303 23.5954 6.2126 23.5954 6.13564V5.87201Z" fill="white"/>
+                      </svg>
+                      <div class="w-fit h-fit ">
+                        <p class="text-white [font-family:Gilroy-SemiBold] text-[.8333vw] font-normal leading-[normal]">{{ Locales["ucreatedpresets"] }}</p>
+                        <p class="text-[rgba(255,255,255,0.50)] [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px]">{{ Locales["ucreatedpresetsdesc"] }}</p>
+                      </div>
+                    </div>
+                    
+                  </div>
+                  <div class="flex flex-col items-center w-full h-fit gap-[2vh]">
+                    <div class="w-[45.7292vw] h-[50vh] [background:rgba(255,255,255,0.02)] rounded-[.2604vw] py-[2vh]">
+                      <textarea class="text center w-full h-full bg-transparent border-none outline-none text-white [font-family:Gilroy-Medium] text-[.625vw] font-normal leading-[125%] tracking-[-0.24px] xml" v-model="generatedXML">               
+                        <!-- <?xml version="1.0" encoding="UTF-8"?>
+                        <CHandlingDataMgr>
+                          <HandlingData>
+                          <Item type="CHandlingData">
+                            <handlingName>{{currentVehicleName}}</handlingName>
+                            <fMass value="{{ AdvancedConfiguration.fMass }}" />
+                            <fInitialDragCoeff value="{{ AdvancedConfiguration.fInitialDragCoeff }}" />
+                            <fDownforceModifier value="{{ AdvancedConfiguration.fDownforceModifier }}" />
+                            <fPercentSubmerged value="85.000000" />
+                            <vecCentreOfMassOffset x="0.000000" y="0.00000" z="0.000000" />
+                            <vecInertiaMultiplier x="1.400000" y="1.400000" z="1.600000" />
+                            <fDriveBiasFront value="{{ AdvancedConfiguration.fDriveBiasFront }}" />
+                            <nInitialDriveGears value="{{AdvancedConfiguration.nInitialDriveGears}}" />
+                            <fInitialDriveForce value="{{AdvancedConfiguration.fInitialDriveForce}}" />
+                            <fDriveInertia value="{{AdvancedConfiguration.fDriveInertia}}" />
+                            <fClutchChangeRateScaleUpShift value="{{AdvancedConfiguration.fClutchChangeRateScaleUpShift}}" />
+                            <fClutchChangeRateScaleDownShift value="{{ AdvancedConfiguration.fClutchChangeRateScaleDownShift }}" />
+                            <fInitialDriveMaxFlatVel value="{{AdvancedConfiguration.fInitialDriveMaxFlatVel}}" />
+                            <fBrakeForce value="{{AdvancedConfiguration.fBrakeForce}}" />
+                            <fBrakeBiasFront value="{{AdvancedConfiguration.fBrakeBiasFront}}" />
+                            <fHandBrakeForce value="{{AdvancedConfiguration.fHandBrakeForce}}" />
+                            <fSteeringLock value="{{AdvancedConfiguration.fSteeringLock}}" />
+                            <fTractionCurveMax value="{{AdvancedConfiguration.fTractionCurveMax}}" />
+                            <fTractionCurveMin value="{{AdvancedConfiguration.fTractionCurveMin}}" />
+                            <fTractionCurveLateral value="{{AdvancedConfiguration.fTractionCurveLateral}}" />
+                            <fTractionSpringDeltaMax value="0.150000" />
+                            <fLowSpeedTractionLossMult value="{{AdvancedConfiguration.fLowSpeedTractionLossMult}}" />
+                            <fCamberStiffnesss value="0.000000" />
+                            <fTractionBiasFront value="{{AdvancedConfiguration.fTractionBiasFront}}" />
+                            <fTractionLossMult value="{{AdvancedConfiguration.fTractionLossMult}}" />
+                            <fSuspensionForce value="{{AdvancedConfiguration.fSuspensionForce}}" />
+                            <fSuspensionCompDamp value="{{AdvancedConfiguration.fSuspensionCompDamp}}" />
+                            <fSuspensionReboundDamp value="{{AdvancedConfiguration.fSuspensionReboundDamp}}" />
+                            <fSuspensionUpperLimit value="{{AdvancedConfiguration.fSuspensionUpperLimit}}" />
+                            <fSuspensionLowerLimit value="{{AdvancedConfiguration.fSuspensionLowerLimit}}" />
+                            <fSuspensionRaise value="{{AdvancedConfiguration.fSuspensionRaise}}" />
+                            <fSuspensionBiasFront value="{{AdvancedConfiguration.fSuspensionBiasFront}}" />
+                            <fAntiRollBarForce value="{{AdvancedConfiguration.fAntiRollBarForce}}" />
+                            <fAntiRollBarBiasFront value="{{AdvancedConfiguration.fAntiRollBarBiasFront}}" />
+                            <fRollCentreHeightFront value="{{AdvancedConfiguration.fRollCentreHeightFront}}" />
+                            <fRollCentreHeightRear value="{{AdvancedConfiguration.fRollCentreHeightRear}}" />
+                            <fCollisionDamageMult value="1.0000" />
+                            <fWeaponDamageMult value="1.000000" />
+                            <fDeformationDamageMult value="1.000000" />
+                            <fEngineDamageMult value="1.500000" />
+                            <fPetrolTankVolume value="65.000000" />
+                            <fOilVolume value="5.000000" />
+                            <fSeatOffsetDistX value="0.000000" />
+                            <fSeatOffsetDistY value="0.000000" />
+                            <fSeatOffsetDistZ value="0.000000" />
+                            <nMonetaryValue value="35000" />
+                            <strModelFlags>440010</strModelFlags>
+                            <strHandlingFlags>20000</strHandlingFlags>
+                            <strDamageFlags>0</strDamageFlags>
+                            <AIHandling>AVERAGE</AIHandling>
+                            <SubHandlingData>
+                                <Item type="NULL" />
+                                <Item type="NULL" />
+                                <Item type="NULL" />
+                            </SubHandlingData>
+                            </Item>
+                        </HandlingData>
+                        </CHandlingDataMgr> -->
+                    </textarea>
+                    </div>
+                    <div class="flex gap-[1.0417vw] w-fit h-fit">
+               
+                      <div class="flex justify-center items-center w-[9.6243vw] h-[4.3519vh] shrink-0 [background:#FFF] rounded-[.2604vw] text-black text-center [font-family:Gilroy-SemiBold] text-[.7292vw] font-normal leading-[normal] cursor-pointer" @click="copyHandling()">
+                        Copy
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+        </div> 
+      </div>
+      <div class="absolute w-full h-full flex p-[1vw]" 
+      v-if="extrasUI" 
+      :class="recorderUI ? 'justify-end items-end' : 'justify-center items-center'">
+      
+        <div class="flex justify-center items-start py-[2vh] w-fit px-[1vw] h-fit shrink-0  rounded-[0.6vw] border-2 border-solid border-white overflow-hidden bg-[#05080C] flex-col" v-if="recorderUI">
+          <div class="flex items-center justify-between w-[25.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw] border-b-[0.1852vh] border-[#05080C]">
+            <div class="flex w-[50%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-SemiBold] text-[.6333vw] font-normal leading-[normal]">Start Record with [G]</div>
+       
+            <div class="flex w-[50%] h-full justify-center items-center px-[1vw] text-[#84FF84] text-center [font-family:Gilroy-SemiBold] text-[.6333vw] font-normal leading-[normal]">{{counter}}s</div>
+          </div>
+          <div class="flex flex-col items-end w-full h-fit mt-[1vh]">
+            
+            <div class="flex items-center justify-between w-[25.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw_.2604vw_0_0] border-b-[0.1852vh] border-[#05080C]">
+              <div class="flex w-[50%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-SemiBold] text-[.6333vw] font-normal leading-[normal]">Goals</div>
+         
+              <div class="flex w-[50%] h-full justify-center items-center px-[1vw] text-white text-center [font-family:Gilroy-SemiBold] text-[.6333vw] font-normal leading-[normal]">Seconds</div>
+            </div>
+            <div class="flex items-center justify-between w-[25.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[0vw] border-b-[0.1852vh] border-[#05080C]">
+              <div class="flex w-[50%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">0-60 km/h</div>
+              
+      
+              <div class="flex w-[50%] h-full justify-center  items-center px-[1vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">
+                {{reachSixty}}s</div>
+            </div>
+            <div class="flex items-center justify-between w-[25.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[0vw] border-b-[0.1852vh] border-[#05080C]">
+              <div class="flex w-[50%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">0-100 km/h</div>
+
+              <div class="flex w-[50%] h-full justify-center  items-center px-[1vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">
+                {{reachHundred}}s</div>
+            </div>
+            
+           
+            <div class="flex items-center justify-between w-[25.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[0_0_.2604vw_.2604vw]">
+              <div class="flex w-[50%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">1/4 mile</div>
+ 
+              <div class="flex w-[50%] h-full justify-center  items-center px-[1vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">
+                {{reachQuarterMile}}s</div>
+            </div>
+            <div class="flex items-center justify-between w-[25.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[0_0_.2604vw_.2604vw]">
+              <div class="flex w-[50%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">1/2 mile</div>
+ 
+              <div class="flex w-[50%] h-full justify-center  items-center px-[1vw] text-white text-center [font-family:Gilroy-Medium] text-[.5333vw] font-normal leading-[normal]">
+                {{reachHalfMile}}s</div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between w-[25.7292vw] h-fit py-[1.2vh] shrink-0 [background:rgba(255,255,255,0.02)] rounded-[.2604vw] border-b-[0.1852vh] border-[#05080C] mt-[1vh]">
+            <div class="flex w-[50%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-SemiBold] text-[.6333vw] font-normal leading-[normal]">Menu [BackSpace]</div>
+       
+            <div class="flex w-[50%] h-full items-center justify-center px-[0.8vw] text-white text-center [font-family:Gilroy-SemiBold] text-[.6333vw] font-normal leading-[normal]">Reset [Z]</div>
+          </div>
+        </div>
+        <div class="flex justify-start items-center  w-[15vw]  h-fit shrink-0  rounded-[0.6vw] border-2 border-solid border-white overflow-hidden bg-[#05080C] flex-col gap-[1vh] pb-[1vh]" v-if="presetInput">
+          <div class="w-full h-[50%] [background:rgba(255,255,255,0.02)] text-white text-center [font-family:Gilroy-SemiBold] text-[.6333vw] font-normal leading-[normal] py-[1vh]">Save Preset</div>
+          <div class="flex w-[14vw] h-[5vh] [background:rgba(255,255,255,0.02)] rounded-[0.6vw] overflow-hidden">
+            <div class="w-[20%] h-full [background:rgba(255,255,255,0.02)] flex justify-center items-center"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="9" viewBox="0 0 17 9" fill="none">
+              <path d="M4.5 6.75C5.125 6.75 5.65625 6.53125 6.09375 6.09375C6.53125 5.65625 6.75 5.125 6.75 4.5C6.75 3.875 6.53125 3.34375 6.09375 2.90625C5.65625 2.46875 5.125 2.25 4.5 2.25C3.875 2.25 3.34375 2.46875 2.90625 2.90625C2.46875 3.34375 2.25 3.875 2.25 4.5C2.25 5.125 2.46875 5.65625 2.90625 6.09375C3.34375 6.53125 3.875 6.75 4.5 6.75ZM4.5 9C3.25 9 2.1875 8.5625 1.3125 7.6875C0.4375 6.8125 0 5.75 0 4.5C0 3.25 0.4375 2.1875 1.3125 1.3125C2.1875 0.4375 3.25 0 4.5 0C5.5125 0 6.397 0.2875 7.1535 0.8625C7.91 1.4375 8.438 2.15 8.7375 3H15.0187L16.5 4.48125L13.875 7.48125L12 6L10.5 7.5L9 6H8.7375C8.425 6.9 7.88125 7.625 7.10625 8.175C6.33125 8.725 5.4625 9 4.5 9Z" fill="white"/>
+            </svg></div>
+            <input type="text" class="w-[80%] h-full outline-none bg-[transparent] border-none px-[0.5vw] text-white text-center [font-family:Gilroy-SemiBold] text-[.6333vw] font-normal leading-[normal]" placeholder="Preset Name | Saved" v-model="presetName">
+          </div>
+          <div class="flex justify-center items-center w-[14vw] h-[4.3519vh] shrink-0 [background:#FFF] rounded-[.2604vw] text-black text-center [font-family:Gilroy-SemiBold] text-[.7292vw] font-normal leading-[normal] mt-[0.5vh]" @click="applySettingsAdvanced">
+            Save Preset
+          </div>
+        </div>
+       
+      </div>
+    </div>
+    <script src="./src/scripts/main.js"></script>
+  </body>
+</html>

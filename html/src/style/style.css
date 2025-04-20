@@ -1,0 +1,78 @@
+@font-face {
+  font-family: "Gilroy-Light";
+  src: url("../fonts/Gilroy-Light.ttf") format("opentype");
+}
+@font-face {
+  font-family: "Gilroy-Regular";
+  src: url("../fonts/Gilroy-Regular.ttf") format("opentype");
+}
+@font-face {
+  font-family: "Gilroy-Medium";
+  src: url("../fonts/Gilroy-Medium.ttf") format("opentype");
+}
+@font-face {
+  font-family: "Gilroy-Bold";
+  src: url("../fonts/Gilroy-Bold.ttf") format("opentype");
+}
+
+@font-face {
+  font-family: "Gilroy-Semibold";
+  src: url("../fonts/Gilroy-Semibold.ttf") format("opentype");
+}
+@font-face {
+  font-family: "Gilroy-Thin";
+  src: url("../fonts/Gilroy-Thin.otf") format("opentype");
+}
+
+*{
+  transition: all 0.3s ease;
+}
+
+body {
+  overflow: hidden;
+}
+::-webkit-scrollbar-track { border-radius: 0px; } ::-webkit-scrollbar { width: 0px; height: 0px; } ::-webkit-scrollbar-thumb { border-radius: 0px; background-color: transparent; } 
+
+
+
+.group:hover .svg-menu path {
+  fill-opacity: 50;
+  animation: bounce-right 1s infinite;
+}
+@keyframes bounce-right {
+  0%, 100% {
+    transform: translateX(-3px);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+}
+@keyframes bounce-right {
+  0%, 100% {
+    transform: translateX(-3px);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+}
+
+.range {
+
+  -webkit-appearance: none;
+  background: rgba(255,255,255,0.02);
+  overflow: hidden;
+}
+
+
+::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: .9208vw;
+  height: 2vh;
+  border-radius: .1042vw;
+  background: linear-gradient(90deg, #FFF 0%, #1C202E 100%);
+  box-shadow: -2000px 0 0 2000px #fff; 
+}
+
+.stt {
+  stroke-dasharray: 0 200;
+}
